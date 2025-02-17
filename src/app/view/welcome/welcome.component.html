@@ -1,0 +1,97 @@
+<!-- =================================
+            VIEW WELCOME
+================================== -->
+
+<!-- SECTOR CABECERA -->
+<div class="card">
+    <div class="shadow-5 border-round p-2">
+        <p-menubar [model]="opciones">
+
+            <!-- LOGO -->
+            <ng-template pTemplate="start">
+                <!-- <img src="assets/img/LogoColorPuro.png" alt="Logddo" height="30" class="ml-2" /> -->
+            </ng-template>
+
+            <!-- OPCIONES  -->
+            <ng-template pTemplate="item" let-item let-root="root">
+                <a pRipple class="flex align-items-center p-menuitem-link" (click)="navOpciones(item.link)">
+                    <span [class]="item.icon"></span>
+                    <span class="ml-2">{{ item.label }}</span>
+                    <p-badge *ngIf="item.badge" [ngClass]="{ 'ml-auto': !root, 'ml-2': root }" [value]="item.badge" />
+                    <span *ngIf="item.shortcut"
+                        class="ml-auto border-1 surface-border border-round surface-100 text-xs p-1">{{ item.shortcut
+                        }}</span>
+                    <i *ngIf="item.items"
+                        [ngClass]="['pi', root ? 'pi-angle-down ml-2' : 'pi-angle-right ml-auto']"></i>
+                </a>
+            </ng-template>
+
+            <!-- LOGIN -->
+            @if (acceso) {
+            <ng-template pTemplate="end">
+                <p-button label="Dashboard" icon="pi pi-chart-bar pi-exclamation-circle" severity="primary"
+                    [outlined]="true" (click)="navDashboard()" />
+            </ng-template>
+            }
+            @else{
+            <ng-template pTemplate="end">
+                <!-- LOGIN -->
+                <p-button label="Login" icon="pi pi-lock" severity="primary" [outlined]="true" (click)="navLogin()" />
+                <!-- REGISTER -->
+                @if(countUsers
+                < 1){ <p-button label="Register" icon="pi pi-user" severity="secondary" [outlined]="true"
+                    (click)="navRegister()" class="ml-3" />
+                }
+            </ng-template>
+            }
+        </p-menubar>
+    </div>
+</div>
+
+<!-- SECTOR CONTENIDO -->
+<router-outlet> </router-outlet>
+
+<!-- SECTOR FOOTER -->
+<div class="grid pt-8 tb-3">
+    <div class="col-12 md:col-4 mb-4 px-5">
+        <div class="text-2xl text-primary font-bold m-3">Casa Matriz</div>
+        <span class="text-700 line-height-3">
+            <ul>
+                <li><b>DIRECCIÓN: </b> Nataniel Aguirre Nro 23</li>
+                <li><b>FONO: </b>Calle 64-76352 - 8726633</li>
+                <li><b>email: </b>minexa.webmail.com</li>
+            </ul>
+        </span>
+    </div>
+    <div class="col-12 md:col-4 mb-4 px-5">
+        <div class="text-2xl text-primary font-bold m-3">Sucursales</div>
+        <span class="text-700 line-height-3">
+            <ul>
+                <li><b>POTOSÍ: </b> Nataniel Aguirre # 23 - 65-23652</li>
+                <li><b>ORURO: </b>Rafael Nogal # 34 - 8726633</li>
+                <li><b>TUPIZA: </b>Moreira Rivera # 55 - 34434444</li>
+            </ul>
+        </span>
+    </div>
+    <div class="col-12 md:col-4 mb-4 px-5">
+        <div class="text-2xl text-primary font-bold m-3">Enlaces</div>
+        <span class="text-700 line-height-3">
+            <ul>
+                <li><a href="https://mineria.gob.bo/" target="_blank">Ministerio de Mineria y Metalurgia</a></li>
+                <li><a href="https://www.senarecom.gob.bo/" target="_blank">Senarecom</a></li>
+                <li><a href="https://www.comibol.gob.bo/index.php/component/content/category/89-ultimas-noticias"
+                        target="_blank">Comibol</a></li>
+            </ul>
+        </span>
+    </div>
+</div>
+<div class="col-12 text-center py-3">
+    <img src="assets/icons/facebook.png" alt="facebock" height="30" class="ml-3" />
+    <img src="assets/icons/twiter.png" alt="twiter" height="30" class="ml-3" />
+    <img src="assets/icons/instagram.png" alt="instagram" height="30" class="ml-3" />
+    <img src="assets/icons/tik-tok.png" alt="TikTok" height="30" class="ml-3" />
+</div>
+<div class="layout-footer py-3">
+    Copyright © 2024
+    <span class="font-medium ml-2">Aro Systems Development</span>
+</div>

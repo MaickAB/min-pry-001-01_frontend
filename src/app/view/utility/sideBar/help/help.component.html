@@ -1,0 +1,88 @@
+<!-- =================================
+        VIEW HELP
+================================== -->
+<p-sidebar [(visible)]="sidebarVisible" position="right" [style]="{'width':'40%'}">
+
+
+    <!-- SECTOR HEADER -->
+    <div class="card-header shadow-5">
+        <h3>Ayuda</h3>
+    </div>
+    <hr>
+    <div class="grid">
+        <div class="col-8">
+            <p-inputGroup>
+                <input type="text" pInputText placeholder="Escriba el tema a consultar..." />
+                <button type="button" pButton icon="pi pi-search" class="p-button-info"></button>
+            </p-inputGroup>
+        </div>
+        <div class="col-4">
+            <span class="loader"></span>
+        </div>
+    </div>
+
+    <!-- SECTOR BODY -->
+    <div class="card-body shadow-5">
+        <p>
+            Bienvenido al Sistema de Ayuda de MINEXA. Seleccione un Tema.
+        </p>
+
+        <p-accordion>
+            <p-accordionTab header="EMPRESA">
+                <p-accordion>
+                    <p-accordionTab header="¿Cómo cambiar los datos de la Empresa?">
+                        <div class="grid">
+                            <div class="col-10">
+                                <ul>
+                                    <li>Seleccione la opción Empresa del menú de opciones.</li>
+                                    <li>Modifique los campos que guste.</li>
+                                    <li>Selecione la opción Guardar.</li>
+                                </ul>
+                            </div>
+                            <div class="col-2">
+                                <a href=""></a>
+                            </div>
+                        </div>
+
+                    </p-accordionTab>
+                    <p-accordionTab header="¿Cómo agregar una nueva Sucursal?">
+                        <p>asfdasfd</p>
+                    </p-accordionTab>
+                    <p-accordionTab header="¿Cómo Editar una Sucursal?">
+                        <ul>
+                            <li>¿Cómo agregar un nuevo Mineral Simple?</li>
+                            <li>¿Cómo Editar un nuevo Mineral Compuesto?</li>
+                            <li>¿Cómo Cambiar los datos de un Mineral?</li>
+                            <li>¿Puedo eliminar Minerales?</li>
+                        </ul>
+                    </p-accordionTab>
+                </p-accordion>
+            </p-accordionTab>
+            <p-accordionTab header="SUCURSALES">
+                <ul>
+                    <li>¿Cómo agregar una nueva Sucursal?</li>
+                    <li>¿Cómo Editar una Sucursal?</li>
+                    <li>¿Cómo Eliminar una Sucursal?</li>
+                    <li>¿Qué pasa si eliminé una Sucursal?</li>
+                    <li>¿Cómo Restaurar una Sucursal?</li>
+                </ul>
+            </p-accordionTab>
+            <p-accordionTab header="MINERALES">
+                <ul>
+                    <li>¿Cómo agregar un nuevo Mineral Simple?</li>
+                    <li>¿Cómo Editar un nuevo Mineral Compuesto?</li>
+                    <li>¿Cómo Cambiar los datos de un Mineral?</li>
+                    <li>¿Puedo eliminar Minerales?</li>
+                </ul>
+            </p-accordionTab>
+        </p-accordion>
+
+    </div>
+    <hr>
+
+    <!-- SECTOR FOOTER -->
+    <div class="card-footer">
+
+    </div>
+
+</p-sidebar>

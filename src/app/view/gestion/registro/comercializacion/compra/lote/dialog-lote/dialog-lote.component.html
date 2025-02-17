@@ -1,0 +1,206 @@
+<!-- =================================
+        VIEW DIALOG LOTE
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE COMPRA" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+
+            <!-- BODY HEADER -->
+            <div class="grid flex justify-content-center">
+                <div class="col-10">
+
+                    <!-- REGIONAL -->
+                    <div class="grid field">
+                        <div class="col-4 text-right pt-2">
+                            <label>Regional:</label>
+                        </div>
+                        <div class="col-6">
+                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
+                                [(ngModel)]="lote.idRegional" (onChange)="loadSucursales($event.value)" />
+                            <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
+                        </div>
+                    </div>
+
+                    <!-- SUCURSAL -->
+                    <div class="grid field">
+                        <div class="col-4 text-right pt-2">
+                            <label>Sucursal:</label>
+                        </div>
+                        <div class="col-6">
+                            <p-dropdown id="idSucursal" [options]="sucursales" optionValue="id" optionLabel="nombre"
+                                [(ngModel)]="lote.idSucursal" (onChange)="loadNumLote($event.value)" />
+                            <small class="p-error" *ngIf="!valIdSucursal()">Requerido.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY DETAIL -->
+            <div class="grid">
+
+                <!-- COL-I -->
+                <div class="col-12 md:col-4">
+                    <div class="card shadow-3  text-center" style="min-height: 550px;">
+
+                        <!-- MINERAL -->
+                        <div class="field text-left">
+                            <label for="idMineral">Mineral</label>
+                            <p-dropdown id="idMineral" [options]="minerales" optionValue="id" optionLabel="nombre"
+                                [(ngModel)]="lote.idMineral" (onChange)="loadMineral($event.value)" />
+                            <small class="p-error" *ngIf="!valIdMineral()">Requerido.</small>
+                        </div>
+                        <hr>
+
+                        <!-- IMG-MINERAL -->
+                        <div>
+                            <img [src]="mineral.foto" alt="Vista previa de la imagen"
+                                style="width: 100%; height: 250px;" />
+                        </div>
+                        <hr>
+
+                        <!-- NUM-LOTE -->
+                        <div class="field">
+                            <h2> <b>Nº Lote: {{lote.numLote}}</b></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COL-II -->
+                <div class="col-12 md:col-8">
+                    <div class="card shadow-3" style="min-height: 550px;">
+
+                        <!-- COOPERATIVA -->
+                        <div class="field">
+                            <label for="idCooperativa">Cooperativas</label>
+                            <p-dropdown id="idCooperativa" [options]="cooperativas" optionValue="id"
+                                optionLabel="nombre" [(ngModel)]="lote.idCooperativa"
+                                (onChange)="loadSocios($event.value)" />
+                            <small class="p-error" *ngIf="!valIdCooperativa()">Requerido.</small>
+                        </div>
+
+                        <!-- SOCIO -->
+                        <div class="field">
+                            <label for="idSocio">Socios</label>
+                            <p-dropdown id="idSocio" [options]="socios" [(ngModel)]="lote.idSocio" optionValue="id"
+                                optionLabel="nombre" />
+                            <small class="p-error" *ngIf="!valIdSocio()">Requerido.</small>
+                        </div>
+
+                        <!-- MOLIENDEROS -->
+                        <div class="field">
+                            <label for="idMoliendero">Moliendero</label>
+                            <p-dropdown id="idMoliendero" [options]="molienderos" [(ngModel)]="lote.idMoliendero"
+                                optionValue="id" optionLabel="nombre" />
+                        </div>
+
+                        <div class="grid">
+
+                            <!-- SACOS -->
+                            <div class="col-6 field">
+                                <label for="sacos">Núm. de Sacos</label>
+                                <input type="number" pInputText id="sacos" [(ngModel)]="lote.sacos" class="w-full" />
+                                <small class="p-error" *ngIf="!valSacos()">Opcional, Tipo Numérico.</small>
+                            </div>
+
+                            <!-- PESO BRUTO -->
+                            <div class="col-6 field">
+                                <label for="pesoBruto">Peso Bruto (Kg)</label>
+                                <input type="number" pInputText id="pesoBruto" [(ngModel)]="lote.pesoBruto"
+                                    class="w-full" (keyup)="calculateHumedadKg()" (change)="calculateHumedadKg()" />
+                                <small class="p-error" *ngIf="!valPesoBruto()">Requerido, Tipo Numérico.</small>
+                            </div>
+                        </div>
+
+                        <!-- HUMEDAD -->
+                        <div class="grid">
+                            <div class="col-6">
+                                <div class="field">
+                                    <label for="humedad">Humedad (%): </label>
+                                    <input type="number" pInputText id="humedad" [(ngModel)]="humedadPorcentaje"
+                                        class="w-full" (keyup)="calculateHumedadKg()" (change)="calculateHumedadKg()">
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="field">
+                                    <label for="humedad">Humedad (Kg): </label>
+                                    <input type="number" pInputText id="humedad" [(ngModel)]="lote.humedad"
+                                        class="w-full" (keyup)="calculateHumedadPorcentaje()"
+                                        (change)="calculateHumedadPorcentaje()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TARA -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="tara">Tara (Kg): </label>
+                            </div>
+                            <div class="col-4">
+                                <input type="number" pInputText id="tara" [(ngModel)]="lote.tara" class="w-full"
+                                    [disabled]="true">
+                            </div>
+                            <div class="col-2 text-center">
+                                <p-checkbox [(ngModel)]="tara" [binary]="true"
+                                    [style]="{'transform': 'scale(1.5)', 'margin-top': '10px'}"
+                                    (onChange)="calculatePesoNeto()" />
+                            </div>
+                        </div>
+
+                        <!-- PESO NETO -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="pesoNeto">Peso Neto (Kg): </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="pesoNeto" [(ngModel)]="pesoNeto" class="w-full"
+                                    [disabled]="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

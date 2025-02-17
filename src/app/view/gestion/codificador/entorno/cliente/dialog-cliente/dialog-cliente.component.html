@@ -1,0 +1,118 @@
+<!-- =================================
+        VIEW DIALOG CLIENTE
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE CLIENTES" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+
+            <!-- BODY-HEADER -->
+            <div class="grid flex justify-content-center">
+                <div class="col-10">
+
+                    <!-- REGIONAL -->
+                    <div class="grid field">
+                        <div class="col-4 text-right pt-2">
+                            <label>Regional:</label>
+                        </div>
+                        <div class="col-6">
+                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
+                                [(ngModel)]="cliente.idRegional" />
+                            <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY DETAIL -->
+            <div class="card shadow-3">
+                <div class="grid">
+
+                    <!-- COL-I -->
+                    <div class="col-12 md:col-4 text-center pt-5">
+                        <i class="pi pi-users" style="font-size: 160px"></i>
+                    </div>
+
+                    <!-- COL-II -->
+                    <div class="col-12 md:col-8 pr-5">
+
+                        <!-- CODIGO -->
+                        <div class="field">
+                            <label for="codigo">Código</label>
+                            <input type="text" pInputText id="codigo" [(ngModel)]="cliente.codigo" class="w-full" />
+                            <small class="p-error" *ngIf="!valCodigo()">Requerido, Alfanumérico de 1-20.</small>
+                        </div>
+
+                        <!-- NOMBRE -->
+                        <div class="field">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" pInputText id="nombre" [(ngModel)]="cliente.nombre" class="w-full" />
+                            <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de 1-50.</small>
+                        </div>
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="field">
+                            <label for="descripcion">Description</label>
+                            <textarea pInputTextarea id="descripcion" [(ngModel)]="cliente.descripcion" rows="3"
+                                cols="20" class="w-full"></textarea>
+                            <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de
+                                0-200.</small>
+                        </div>
+
+                        <!-- FONO -->
+                        <div class="grid pt-2">
+                            <div class="col-6 text-right pt-3">
+                                <label for="porcentaje">Teléfono :</label>
+                            </div>
+                            <div class="col-6">
+                                <input type="text" pInputText id="fono" [(ngModel)]="cliente.fono" class="w-full" />
+                                <small class="p-error" *ngIf="!valFono()">Opcional, Numérico de 0-10.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

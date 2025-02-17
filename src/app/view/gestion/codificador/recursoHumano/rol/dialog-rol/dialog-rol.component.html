@@ -1,0 +1,148 @@
+<!-- =================================
+        VIEW DIALOG ROL
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE ROLES Y PERMISOS" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+
+            <!-- BODY-HEADER -->
+            <div class="grid flex justify-content-center">
+                <div class="col-10">
+
+                    <!-- REGIONAL -->
+                    <div class="grid field">
+                        <div class="col-4 text-right pt-2">
+                            <label>Regional:</label>
+                        </div>
+                        <div class="col-6">
+                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
+                                [(ngModel)]="rol.idRegional" />
+                            <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY-DETAIL -->
+            <div class="grid">
+
+                <!-- BODY-HEADER -->
+                <div class="col-12 sm:col-4">
+                    <div class="card shadow-3" style="min-height: 1000px;">
+
+                        <!-- IMG -->
+                        <div class="text-center py-5">
+                            <i class="pi pi-user" style="font-size: 150px"></i>
+                            <hr>
+                            <hr>
+                        </div>
+
+                        <!-- NOMBRE -->
+                        <div class="field">
+                            <label for="nombre">Nombre</label>
+                            <input type="text" pInputText id="nombre" [(ngModel)]="rol.nombre" class="w-full" />
+                            <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de
+                                1-50.</small>
+                        </div>
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="field">
+                            <label for="descripcion">Description</label>
+                            <textarea pInputTextarea id="descripcion" [(ngModel)]="rol.descripcion" rows="3" cols="20"
+                                class="w-full"></textarea>
+                            <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de
+                                0-200.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BODY-DETAIL -->
+                <div class="col-12 sm:col-8">
+                    <div class="card shadow-3" style="min-height: 1000px;">
+                        <p-tabView [(activeIndex)]="activeIndex">
+
+                            <!-- TAP I -->
+                            <p-tabPanel header="PERMISOS">
+                                <h5>Permisos disponibles</h5>
+                                <hr>
+                                <!-- PERMISOS -->
+                                <div class="grid">
+
+                                    @for (permiso of permisos; track permiso.id) {
+                                    <div class="col-12 md:col-6">
+
+                                        <!-- TABLE -->
+                                        <p-table [value]="permiso.opciones" [(selection)]="selected" dataKey="id"
+                                            [tableStyle]="{'width': '100%'}">
+
+                                            <!-- TABLE HEADER -->
+                                            <ng-template pTemplate="header">
+                                                <tr>
+                                                    <th style="width: 80%">{{permiso.nombre}}</th>
+                                                    <th style="width: 20%"></th>
+                                                </tr>
+                                            </ng-template>
+
+                                            <!-- TABLE BODY -->
+                                            <ng-template pTemplate="body" let-opcion>
+                                                <tr>
+                                                    <td>{{opcion.nombre}}</td>
+                                                    <td>
+                                                        <p-tableCheckbox [value]="opcion" />
+                                                    </td>
+                                                </tr>
+                                            </ng-template>
+                                        </p-table>
+                                    </div>
+                                    }
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

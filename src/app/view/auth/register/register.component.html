@@ -1,0 +1,48 @@
+<!-- =================================
+            VIEW REGISTER
+================================== -->
+
+<div class="flex justify-content-center">
+    <div class="surface-card p-8 shadow-5 border-round w-full lg:w-6 my-5">
+        <!-- TITULO -->
+        <div class="text-center mb-5">
+            <div class="text-900 text-3xl font-medium mb-3">REGISTRO DE USUARIO</div>
+            <span class="text-600 font-medium line-height-3">Ingrese sus datos para registrarse en el Sistema</span>
+            <span class="text-danger-600 font-medium line-height-3">{{error}}</span>
+        </div>
+
+        <!-- NOTIFICACIÓN -->
+        <p-toast />
+
+        <div>
+            <!-- NOMBRE -->
+            <label for="name" class="block text-900 font-medium mb-2">Nombre</label>
+            <input id="name" type="text" [(ngModel)]="usuario.login" placeholder="Ingrese su Nombre Completo..."
+                pInputText class="w-full mb-3" required>
+
+            <!-- EMAIL -->
+            <label for="email" class="block text-900 font-medium mb-2">Usuario</label>
+            <input id="email" type="text" [(ngModel)]="usuario.email" placeholder="Ingrese su Correo Electrónico..."
+                pInputText class="w-full mb-3" required>
+
+            <!-- PASSWORD -->
+            <label for="password" class="block text-900 font-medium mb-2">Contraseña</label>
+            <input id="password" type="password" [(ngModel)]="usuario.password" placeholder="Ingrese su Constraseña"
+                pInputText class="w-full mb-3" required>
+
+            <!-- CONFIRM PASSWORD -->
+            <label for="password_confirmation" class="block text-900 font-medium mb-2">Confirmar Contraseña</label>
+            <input id="password_confirmation" type="password" [(ngModel)]="usuario.password_confirmation"
+                placeholder="Confirme su Constraseña" pInputText class="w-full mb-3" required>
+
+            <div class="flex align-items-center justify-content-end mb-6">
+                <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Olvidó su
+                    contraseña?</a>
+            </div>
+
+            <!-- BUTTON -->
+            <button pButton pRipple label="Sign In" icon="pi pi-usuarioRequest" class="w-full"
+                (click)="saveUsuario()"></button>
+        </div>
+    </div>
+</div>

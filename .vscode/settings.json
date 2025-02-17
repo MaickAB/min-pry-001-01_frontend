@@ -1,0 +1,4 @@
+{
+    "prettier.singleAttributePerLine": true,
+    "editor.fontFamily": "Consolas, 'arial', monospace"
+}

@@ -1,0 +1,83 @@
+<!-- ======================================
+        VIEW INDEX LEYES 
+======================================= -->
+<!-- SECTOR BODY -->
+
+<div class="grid">
+    <div class="col-6">
+        <h3><span class="prefijoRow">Leyes de Laboratorio</span></h3>
+    </div>
+    <div class="col-6 text-right">
+        <!-- NUEVO -->
+        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary" label="Agregar Ley"
+            icon="pi pi-plus" (click)="showCreate()" [style]="{'width':'200px'}" />
+    </div>
+</div>
+<hr>
+<div *ngIf="!loading">
+    <!-- TABLE -->
+    <p-table #dt [value]="leyes" [rowHover]="true" dataKey="id">
+
+        <!-- TABLE HEADER -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width:20%">
+                    SOLICITANTE
+                </th>
+                <th style="width:20%">
+                    LABORATORIO
+                </th>
+                <th style="width:40%">
+                    LEYES
+                </th>
+                <th style="width:20%">
+                    OPCIONES
+                </th>
+            </tr>
+        </ng-template>
+
+        <!-- TABLE BODY -->
+        <ng-template pTemplate="body" let-ley>
+            <tr>
+                <td>
+                    @if(ley.solicitante.nombre == 'TRANSE'){
+                    <h3>{{ ley.solicitante.nombre }}</h3>
+                    }@else{
+                    {{ ley.solicitante.nombre }}
+                    }
+                </td>
+                <td>{{ ley.laboratorio.nombre }}</td>
+                <td>
+                    @for (detalle of ley.detalles; track $index) {
+                    <span class="prefijoRow">{{detalle.mineral?.abreviatura || ''}} : </span>
+                    {{detalle.valor}}&nbsp;{{detalle.unidad_medida_ley?.abreviatura || ''}} &nbsp;&nbsp;&nbsp;
+                    }
+                </td>
+                <td>
+                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        severity="success" (click)="showEdit(ley)" />
+                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="showDelete(ley.id)" />
+                </td>
+            </tr>
+        </ng-template>
+
+        <!-- TABLE FOOTER -->
+        <ng-template pTemplate="footer">
+        </ng-template>
+    </p-table>
+</div>
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">Cargando...</span>
+    </div>
+</div>
+
+
+<!-- SECTOR FOOTER -->
+<app-dialog-ley (changeLey)="show()"></app-dialog-ley>
+<p-confirmDialog [style]="{ width: '450px' }" />
+<!-- NOTIFICACIÓN -->
+<p-toast />

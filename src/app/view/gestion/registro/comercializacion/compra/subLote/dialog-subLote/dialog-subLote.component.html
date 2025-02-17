@@ -1,0 +1,165 @@
+<!-- =================================
+        VIEW DIALOG SUB-LOTE
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRAR DESCUENTOS" [modal]="true"
+    [draggable]="false" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <!-- BODY-HEADER -->
+        <div class="grid flex justify-content-center">
+            <div class="col-8">
+
+                <!-- SOCIO -->
+                <div class="field grid">
+                    <div class="col-4 text-right">
+                        <label class="mb-2 md:mb-0">Socio :</label>
+                    </div>
+                    <div class="col-8">
+                        <p-dropdown id="socio" [options]="lote.cooperativa.socios" [(ngModel)]="subLote.idSocio"
+                            optionValue="id" optionLabel="nombre" />
+                        <small class="p-error" *ngIf="!valIdSocio()">Requerido.</small>
+                    </div>
+                </div>
+
+                <!-- PORCENTAJE -->
+                <div class="field grid">
+                    <div class="col-4 text-right">
+                        <label class="mb-2 md:mb-0">Porcentaje (%) :</label>
+                    </div>
+                    <div class="col-8">
+                        <input pInputText type="number" [(ngModel)]="subLote.porcentaje" (keyup)="calcularAuxSubLote()"
+                            (change)="calcularAuxSubLote()" />
+                        <small class="p-error" *ngIf="!valPorcentaje()">Requerido.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY-BODY -->
+        <div class="card-body shadow-3">
+            <div class="grid">
+                <div class="col-12 sm:col-6">
+                    <div class="card">
+                        <h5>Mineral</h5>
+                        <hr>
+
+                        <!-- PESO BRUTO -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="pesoBruto">Peso Bruto (Kg) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="pesoBruto" [(ngModel)]="auxSubLote.pesoBruto"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- TARA -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="tara">Tara (Kg) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="tara" [(ngModel)]="auxSubLote.tara" class="w-full"
+                                    [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- HUMEDAD -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-2">
+                                <label for="humedad">Humedad (Kg) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="humedad" [(ngModel)]="auxSubLote.humedad"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- PESO NETO -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="pesoNeto">Peso Neto (Kg) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="pesoBruto" [value]="auxSubLote.pesoNeto"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-12 sm:col-6">
+                    <div class="card">
+                        <h5>Precios</h5>
+                        <hr>
+
+                        <!-- PESO BRUTO -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="pesoBruto">Precio ($us) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="pesoBruto" [(ngModel)]="auxSubLote.costoMineralSus"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- TARA -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="tara">Regalias ($us) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="tara" [(ngModel)]="auxSubLote.costoRegaliaSus"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- PESO BRUTO -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="pesoBruto">Precio (Bs) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="pesoBruto" [(ngModel)]="auxSubLote.costoMineralBs"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- TARA -->
+                        <div class="field grid">
+                            <div class="col-6 text-right pt-3">
+                                <label for="tara">Regalias (Bs) : </label>
+                            </div>
+                            <div class="col-6">
+                                <input type="number" pInputText id="tara" [(ngModel)]="auxSubLote.costoRegaliaBs"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

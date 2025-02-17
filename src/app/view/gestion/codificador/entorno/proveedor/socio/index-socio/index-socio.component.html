@@ -1,0 +1,85 @@
+<!-- =================================
+        VIEW INDEX SOCIOS
+================================== -->
+<!-- SECTOR BODY -->
+<div *ngIf="!loading">
+    <h5>Gestión de Socios</h5>
+    <hr>
+    <!-- BODY DETAIL -->
+    <!-- TABLE -->
+    <p-table #dt [value]="socios" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [paginator]="true"
+        [globalFilterFields]="['id','codigo','nombre', 'descripcion','fono']" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <!-- TABLE BUTTONS -->
+        <ng-template pTemplate="caption">
+            <div class="grid">
+                <div class="col-12 sm:col-8 flex">
+                    <!-- NUEVO -->
+                    <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
+                        icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                    <!-- REPORTE -->
+                    <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info" label="Reporte"
+                        icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                </div>
+                <div class="col-12 sm:col-4 text-right">
+                    <!-- BUSCAR -->
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Buscar..." class="w-full" />
+                    </span>
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- TABLE HEADER -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="codigo" style="width:45%">
+                    SOCIO <p-sortIcon field="codigo" />
+                </th>
+                <th pSortableColumn="fono" style="width:30%">
+                    TELÉFONO <p-sortIcon field="fono" />
+                </th>
+                <th style="width:25%;">
+                    OPCIONES
+                </th>
+            </tr>
+        </ng-template>
+
+        <!-- BODY TABLE -->
+        <ng-template pTemplate="body" let-socio>
+            <tr>
+                <td>
+                    <span class="prefijoRow">CÓDIGO: </span>{{ socio.codigo }} <br>
+                    <span class="prefijoRow">NOMBRE: </span>{{ socio.nombre }}
+                </td>
+                <td>{{ socio.fono }}</td>
+                <td>
+                    <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        (click)="showReport(socio.id)" />
+                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        severity="success" (click)="showEdit(socio)" />
+                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="showDelete(socio.id)" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 50vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">MINEXA S.R.L.</span>
+    </div>
+</div>
+
+<!-- SECTOR FOOTER -->
+<div class="card-footer">
+    <app-dialog-socio (changeSocio)="show()"></app-dialog-socio>
+    <p-confirmDialog [style]="{ width: '450px' }" />
+    <!-- NOTIFICACIÓN -->
+    <p-toast />
+</div>

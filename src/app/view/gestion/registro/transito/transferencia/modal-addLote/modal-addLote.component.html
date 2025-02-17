@@ -1,0 +1,96 @@
+<!-- =================================
+    VIEW MODAL ADD-LOTE
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="ADICIÓN DE LOTES" [modal]="true"
+    [style]="{'width': '85vw'}" [draggable]="false" styleClass="p-fluid dialog-responsive custom-header">
+    <hr>
+
+    <!-- SECTOR HEADER -->
+    <div class="grid justify-content-center">
+        <!-- SUCURSAL ORIGEN -->
+        <div class="col-12 sm:col-6">
+            <!-- REGIONAL -->
+            <div class="grid field">
+                <div class="col-4 text-right pt-2">
+                    <label>Mineral:</label>
+                </div>
+                <div class="col-8">
+                    <p-dropdown id="idRegional" optionValue="id" optionLabel="nombre" />
+                    <!-- <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small> -->
+                </div>
+            </div>
+
+            <!-- SUCURSAL -->
+            <div class="grid field">
+                <div class="col-4 text-right pt-2">
+                    <label>Fecha:</label>
+                </div>
+                <div class="col-8">
+                    <p-dropdown id="idRegional" optionValue="id" optionLabel="nombre" />
+                    <!-- <small class="p-error" *ngIf="!valIdSucursal()">Requerido.</small> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <div class="card-body shadow-3">
+            <p-table [value]="lotes" [(selection)]="selected" dataKey="id" [tableStyle]="{'width': '100%'}">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 10%">LOTE</th>
+                        <th style="width: 20%">FECHA</th>
+                        <th style="width: 25%">MINERAL</th>
+                        <th style="width: 20%">PESO</th>
+                        <th style="width: 15%">LEY</th>
+                        <th style="width: 10%" class="text-center"><p-tableHeaderCheckbox />
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-lote>
+                    <tr>
+                        <td>
+                            <h2>{{lote.numLote}}</h2>
+                        </td>
+                        <td>
+                            <span class="prefijoRow">FECHA: </span> {{ lote.fechaHora | date:'dd/MM/yyyy' }}<br>
+                            <span class="prefijoRow">HORA: </span> {{ lote.fechaHora | date:'HH:mm:ss' }}
+                        </td>
+                        <td>
+                            <span class="prefijoRow">NOMBRE: </span> {{lote.mineral.nombre}}<br>
+                            <span class="prefijoRow">TARA: </span> {{lote.tara}}<br>
+                            <span class="prefijoRow">HUMEDAD: </span> {{lote.humedad}}
+                        </td>
+                        <td>
+                            <span class="prefijoRow">K-BRUTO: </span> {{lote.pesoBruto}}<br>
+                            <span class="prefijoRow">K-NETO: </span> {{lote.pesoBruto-(lote.tara+lote.humedad)}}
+                        </td>
+                        <td>
+                            @for (ley of lote.leyes; track $index) {
+                            @for (detalle of ley.detalles; track $index) {
+                            <span class="prefijoRow">{{detalle.mineral.abreviatura}} : </span>{{detalle.valor}}
+                            {{detalle.unidad_medida_ley.abreviatura}}<br>
+                            }
+                            }
+                        </td>
+                        <td class="text-center">
+                            <p-tableCheckbox [value]="lote" />
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="custom-footer">
+            <p-button pRipple label="Agregar" icon="pi pi-plus" [text]="true" [raised]="true" severity="primary"
+                [hidden]="saving" (click)="save()" />
+            <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                (click)="cancel()" />
+        </div>
+    </ng-template>
+</p-dialog>

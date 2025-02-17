@@ -1,0 +1,54 @@
+<div class="layout-topbar shadow-5 fondoTopBar">
+
+  <!-- LOGO -->
+  <a class="layout-topbar-logo" routerLink="">
+    <h3 class="text-blue-600 pt-3">MINEXA S.A.</h3>
+  </a>
+
+  <!-- MOSTRAR/OCULATAR SIDERBAR -->
+  <button #menubutton class="p-link layout-menu-button layout-topbar-button" (click)="layoutService.onMenuToggle()">
+    <i class="pi pi-bars textColor"></i>
+  </button>
+
+  <!-- MOSTRAR/OCULATAR TOPBAR -->
+  <button #topbarmenubutton class="p-link layout-topbar-menu-button layout-topbar-button"
+    (click)="layoutService.showProfileSidebar()">
+    <i class="pi pi-ellipsis-v textColor"></i>
+  </button>
+
+  <div #topbarmenu class="layout-topbar-menu"
+    [ngClass]="{ 'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible }">
+
+    <!-- RECARGAR ROLES -->
+    <button class="p-link layout-topbar-button" style="border: 1px solid #888;" (click)="recargarRoles()">
+      <i class="pi pi-refresh textColor"></i>
+      <span>Recargar Roles</span>
+    </button>
+
+    <!-- ROLES-USUARIO -->
+    <p-dropdown [options]="roles" [(ngModel)]="rolSelected" optionLabel="rol" placeholder="Elija un rol..."
+      [style]="{'min-width':'200px','margin-left':'10px'}" (onChange)="showPermisos()" />
+
+    <!-- AYUDA -->
+    <button class="p-link layout-topbar-button" (click)="showHelp()">
+      <i class="pi pi-calendar textColor"></i>
+      <span>Ayuda</span>
+    </button>
+
+    <!-- CONFIGURACIÓN -->
+    <button class="p-link layout-topbar-button" (click)="showConfig()">
+      <i class="pi pi-cog textColor"></i>
+      <span>Configuración</span>
+    </button>
+
+    <!-- USUARIO -->
+    <button class="p-link layout-topbar-button" (click)="showUser()">
+      <i class=" pi pi-user textColor"></i>
+      <span>Usuario</span>
+    </button>
+  </div>
+</div>
+
+<app-help></app-help>
+<app-user></app-user>
+<app-config></app-config>

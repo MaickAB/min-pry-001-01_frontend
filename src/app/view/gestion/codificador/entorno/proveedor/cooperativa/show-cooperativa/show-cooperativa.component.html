@@ -1,0 +1,100 @@
+<!-- =================================
+        VIEW SHOW-COOPERATIVA
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="false" closable="false" header="DETALLE DE COOPERATIVA" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+            <div class="grid">
+
+                <!-- BODY-HEADER -->
+                <div class="col-12 sm:col-4">
+                    <div class="card shadow-3" style="min-height:600px;">
+
+                        <!-- IMG -->
+                        <div class="text-center py-5">
+                            <i class="pi pi-users" style="font-size: 120px"></i>
+                            <hr>
+                            <hr>
+                        </div>
+
+                        <!-- CODIGO -->
+                        <div class="field">
+                            <label for="codigo">Codigo : </label>
+                            <input type="text" pInputText id="mineral" [(ngModel)]="cooperativa.nombre" class="w-full"
+                                [disabled]="true" />
+                        </div>
+
+                        <!-- NOMBRE -->
+                        <div class="field">
+                            <label for="nombre">Nombre : </label>
+                            <input type="text" pInputText id="nombre" [(ngModel)]="cooperativa.nombre" class="w-full"
+                                [disabled]="true" />
+                        </div>
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="field">
+                            <label for="descripcion">Descripción : </label>
+                            <textarea pInputTextarea id="descripcion" [(ngModel)]="cooperativa.descripcion" rows="3"
+                                cols="20" class="w-full" [disabled]="true"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BODY-DETAIL -->
+                <div class="col-12 sm:col-8">
+                    <div class="card shadow-3" style="min-height: 600px;">
+                        <p-tabView [(activeIndex)]="activeIndex">
+
+                            <!-- DEDUCCIONES COOPERATIVA -->
+                            <p-tabPanel header="DEDUCCIONES">
+                                <app-index-deduccionCoop [idCooperativa]="cooperativa.id"
+                                    [deduccionesCoop]="deduccionesCoop"></app-index-deduccionCoop>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- SOCIOS -->
+                            <p-tabPanel header="SOCIOS">
+                                <app-index-socio [idCooperativa]="cooperativa.id" [socios]="socios"></app-index-socio>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 0" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="custom-footer">
+            <p-button pRipple label="Cerrar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                (click)="cancel()" />
+        </div>
+    </ng-template>
+</p-dialog>

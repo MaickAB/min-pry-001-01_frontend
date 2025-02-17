@@ -1,0 +1,143 @@
+<!-- =================================
+        VIEW INDEX PERSONA
+================================== -->
+<!-- SECTOR HEADER -->
+<div class="card-header shadow-5">
+    <h3>Gestión del Personal</h3>
+</div>
+<hr>
+
+<!-- SECTOR BODY -->
+<div *ngIf="!loading">
+    <div class="card-body shadow-5">
+
+        <!-- BODY-HEADER -->
+        <div class="grid flex justify-content-center">
+            <div class="col-10">
+
+                <!-- REGIONAL -->
+                <div class="grid field">
+                    <div class="col-4 text-right pt-2">
+                        <label for="regional">Regional:</label>
+                    </div>
+                    <div class="col-6">
+                        <p-dropdown id="regional" [options]="regionales" optionValue="id" optionLabel="nombre"
+                            (onChange)="filter($event.value)" [style]="{'width': '100%'}" placeholder="TODOS"
+                            [showClear]="true" (onClear)="clearFilter()" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <!-- BODY DETAIL -->
+        <!-- TABLE -->
+        <p-table #dt [value]="personas" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+            [globalFilterFields]="['id','documento','nombre', 'direccion','fono']"
+            [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [showCurrentPageReport]="true">
+
+            <!-- TABLE BUTTONS -->
+            <ng-template pTemplate="caption">
+                <div class="grid">
+                    <div class="col-12 sm:col-8">
+                        <!-- NUEVO -->
+                        <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
+                            icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                        <!-- REPORTE -->
+                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
+                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                    </div>
+                    <div class="col-12 sm:col-4 text-right">
+                        <!-- BUSCAR -->
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text"
+                                (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Buscar..."
+                                class="w-full" />
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+
+            <!-- TABLE HEADER -->
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id" style="width:10%" class="text-center">
+                        FOTO <p-sortIcon field="id" />
+                    </th>
+                    <th pSortableColumn="documento" style="width:30%">
+                        DATOS PERSONAL <p-sortIcon field="documento" />
+                    </th>
+                    <th pSortableColumn="nombre" style="width:20%">
+                        REPARTICIÓN <p-sortIcon field="nombre" />
+                    </th>
+                    <th pSortableColumn="nombre" style="width:20%;">
+                        ASIGNACIÓN <p-sortIcon field="nombre" />
+                    </th>
+                    <th style="width:20%;">
+                        OPCIONES
+                    </th>
+                </tr>
+            </ng-template>
+
+            <!-- TABLE BODY -->
+            <ng-template pTemplate="body" let-persona>
+                <tr>
+                    <td class="text-center">
+                        <img [src]="persona.foto"
+                            style="width: 70px; height:70px; border-radius:50px; border:3px solid #dcdcdc" />
+                    </td>
+                    <td>
+                        <span class="prefijoRow">DOCUMENTO: </span>{{persona.documento}}<br />
+                        <span class="prefijoRow">NOMBRE: </span>{{persona.nombre}} {{persona.apePaterno}}<br />
+                        <span class="prefijoRow">DIRECCIÓN: </span>{{persona.direccion}}<br />
+                        <span class="prefijoRow">TELÉFONO: </span>{{persona.fono}}
+                    </td>
+                    <td>
+                        <span class="prefijoRow">REGIONAL: </span>{{persona.regional.nombre}}<br />
+                        <span class="prefijoRow">TIPO: </span>{{persona.tipo.nombre}}
+                    </td>
+                    @if(persona.asignacion){
+                    <td>
+                        {{persona.asignacion}}
+                    </td>
+                    }@else{
+                    <td>
+                        <font color="red"> No Asignado</font>
+                    </td>
+
+                    }
+
+
+                    <td>
+                        <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true"
+                            severity="info" (click)="showReport(persona.id)" />
+                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                            severity="success" (click)="showEdit(persona.id)" />
+                        <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                            (click)="showDelete(persona.id)" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+<hr>
+
+<!-- SECTOR FOOTER -->
+<div class="card-footer">
+    <app-dialog-persona (changePersona)="show()"></app-dialog-persona>
+    <p-confirmDialog [style]="{ width: '450px' }" />
+    <!-- NOTIFICACIÓN -->
+    <p-toast />
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 50vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">MINEXA S.R.L.</span>
+    </div>
+</div>
