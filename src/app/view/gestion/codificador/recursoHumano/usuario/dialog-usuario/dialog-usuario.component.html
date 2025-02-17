@@ -1,0 +1,241 @@
+<!-- =================================
+        VIEW DIALOG USUARIO
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE USUARIO" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+            <div class="grid">
+
+                <!-- BODY-HEADER -->
+                <div class="col-12 sm:col-4">
+                    <div class="card shadow-3" style="min-height:650px;">
+
+                        <!-- IMG -->
+                        <div *ngIf="imgUrl" class="text-center">
+                            <img [src]="imgUrl" alt="Vista previa de la imagen" style="width: 90px; height: 100px;" />
+                            <h2 *ngIf="personaSelected">CI: {{personaSelected.documento}}</h2>
+                            <hr>
+                            <hr>
+                        </div>
+
+                        <!-- PERSONA -->
+                        <div class="field">
+                            <label for="idTipoPersona">Personal:</label>
+                            <p-dropdown id="idTipoPersona" [options]="personas" [(ngModel)]="personaSelected"
+                                optionLabel="nombre" (onChange)="loadImg()">
+                                <ng-template let-persona pTemplate="item">
+                                    {{ persona.nombre }} {{ persona.apePaterno }}
+                                </ng-template>
+                            </p-dropdown>
+                            <small class="p-error" *ngIf="!valPersona()">Requerido.</small>
+                        </div>
+
+                        <!-- FECHA INICIO -->
+                        <div class="field">
+                            <label for="fechaInicio">Fecha Inicio</label>
+                            <input type="date" pInputText id="fechaInicio" [(ngModel)]="usuario.fechaInicio"
+                                class="w-full" />
+                            <small class="p-error" *ngIf="!valFechaInicio()">Requerido. Tipo fecha.</small>
+                        </div>
+
+                        <!-- FECHA FIN -->
+                        <div class="field">
+                            <label for="fechaFin">Fecha Fin</label>
+                            <input type="date" pInputText id="fechaFin" [(ngModel)]="usuario.fechaFin" class="w-full" />
+                            <!-- <small class="p-error" *ngIf="!valFechaFin()">Requerido, -->
+                            <!-- Fecha.</small> -->
+                        </div>
+
+                        <!-- DESCRIPCIÓN -->
+                        <div class="field">
+                            <label for="descripcion">Decripción</label>
+                            <textarea pInputTextarea id="descripcion" [(ngModel)]="usuario.descripcion" rows="3"
+                                cols="20" class="w-full"></textarea>
+                            <small class="p-error" *ngIf="!valDescripcion()">Requerido. Alfanumérico de 0-200.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BODY-DETAIL -->
+                <div class="col-12 sm:col-8">
+                    <div class="card shadow-3" style="min-height: 650px;">
+                        <p-tabView [(activeIndex)]="activeIndex">
+
+                            <!-- TAP-I -->
+                            <p-tabPanel header="CUENTA">
+                                <div class="grid">
+                                    <div class="col-12 sm:col-8">
+                                        <h5>Cuenta de Usuario</h5>
+                                    </div>
+                                    <div class="col-12 sm:col-4">
+                                        <div class="flex justify-content-end">
+                                            <p-button (onClick)="generarUser()" label="Generar" [rounded]="true"
+                                                [outlined]="true" severity="secondary" icon="pi pi-user" iconPos="left"
+                                                [style]="{'width': '130px'}" />
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                                <hr>
+
+                                <!-- LOGIN -->
+                                <div class="field">
+                                    <label for="login">Usuasrio</label>
+                                    <input type="text" pInputText id="login" [(ngModel)]="usuario.login"
+                                        class="w-full" />
+                                    <small class="p-error" *ngIf="!valLogin()">Requerido. </small>
+                                </div>
+
+                                <!-- PASSWORD -->
+                                <div class="field">
+                                    <label for="password">Contraseña</label>
+                                    <p-password [(ngModel)]="usuario.password" [toggleMask]="true" id="password" />
+                                    <!-- <small class="p-error" *ngIf="!valPassword()">Requerido. Min:8 caracteres.</small> -->
+                                </div>
+
+                                <!-- EMAIL -->
+                                <div class="field">
+                                    <label for="email">Email</label>
+                                    <input type="text" pInputText id="email" [(ngModel)]="usuario.email"
+                                        class="w-full" />
+                                    <small class="p-error" *ngIf="!valEmail()">Requerido. Tipo xxxx.&#64;minexa.com
+                                    </small>
+                                </div>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- TAP-II -->
+                            <p-tabPanel header="ROLES">
+                                <h5>Acceso al Sistema</h5>
+                                <hr>
+                                <!-- ROLES Y PERMISOS -->
+                                <p-table #dt [value]="roles" [(selection)]="rolesSelected" [rows]="10"
+                                    [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+                                    [globalFilterFields]="['id','nombre', 'descripcion']"
+                                    [tableStyle]="{'width': '100%','height':'150px'}" [rowHover]="true" dataKey="id"
+                                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                                    [showCurrentPageReport]="true">
+
+                                    <!-- <p-table [value]="roles" [(selection)]="rolesSelected" dataKey="id"
+                                    [tableStyle]="{'width': '100%','height':'150px'}"> -->
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th pSortableColumn="nombre" style="width: 30%">
+                                                ROL <p-sortIcon field="nombre" />
+                                            </th>
+                                            <th pSortableColumn="descripcion" style="width: 40%">
+                                                DESCRIPCIÓN <p-sortIcon field="descripcion" />
+                                            </th>
+                                            <th style="width: 30%"></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-rol>
+                                        <tr>
+                                            <td>{{rol.nombre}}</td>
+                                            <td>{{rol.descripcion}}</td>
+                                            <td class="text-center">
+                                                <p-tableCheckbox [value]="rol" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 0" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />&nbsp;
+                                    <p-button (onClick)="activeIndex = 2" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- TAP-III -->
+                            <p-tabPanel header="SUCURSALES">
+                                <h5>Acceso a la Información</h5>
+                                <hr>
+                                <!-- SUCURSALES -->
+                                <p-table [value]="sucursales" [(selection)]="sucursalesSelected" dataKey="id"
+                                    [tableStyle]="{'width': '100%','height':'150px'}">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 30%">REGIONAL</th>
+                                            <th style="width: 30%">SUCURSAL</th>
+                                            <th style="width: 30%"></th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-sucursal>
+                                        <tr>
+                                            <td>{{sucursal.regional.nombre}}</td>
+                                            <td>{{sucursal.nombre}}</td>
+                                            <td class="text-center">
+                                                <p-tableCheckbox [value]="sucursal" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{user.persona.nombre}} {{user.persona.apePaterno}}
+                    {{user.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

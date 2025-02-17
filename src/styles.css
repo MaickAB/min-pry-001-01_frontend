@@ -1,0 +1,159 @@
+/* You can add global styles to this file, and also import other style files */
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+/* $gutter: 1rem; //for primeflex grid system */
+@import 'assets/layout/styles/layout/layout.scss';
+
+@import "primeng/resources/primeng.css";
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+.card-header {
+    background-color: #f6f3f3;
+    border-radius: 10px;
+    padding: 10px 15px 2px 15px;
+}
+
+.card-body {
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 10px;
+}
+
+.card-footer {
+    background-color: #f6f3f3;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+/* LOADING */
+.loader {
+    font-size: 40px;
+    font-weight: 600;
+    display: inline-block;
+    letter-spacing: 2px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #3784bf;
+    box-sizing: border-box;
+    animation: spotlight 1s linear infinite alternate;
+}
+
+/* BORDE INPUTS LIQUIDACIONES */
+.rellenable {
+    border: 1px solid #008080;
+}
+
+@keyframes spotlight {
+
+    0%,
+    20% {
+        opacity: 1;
+        letter-spacing: 2px;
+    }
+
+    80%,
+    100% {
+        opacity: 0;
+        letter-spacing: 32px;
+    }
+}
+
+.prefijoRow {
+    color: #00aaaa;
+}
+
+/* ESTILOS DIALOG MODAL
+-------------------------------------- */
+.custom-header .p-dialog-header {
+    background-color: #dcdcdc;
+    border-radius: 20px 20px 0 0;
+    color: #000;
+}
+
+.fondoTopBar {
+    background-color: #dcdcdc;
+}
+
+.textColor {
+    color: #000;
+}
+
+.custom-footer {
+    background-color: #f5f5f5 !important;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.dialog-responsive {
+    width: 90%;
+    background: rgb(255, 255, 255, .9);
+    border-radius: 20px;
+    /* padding: 10px; */
+}
+
+@media (min-width: 768px) {
+    .dialog-responsive {
+        width: 80%;
+    }
+}
+
+@media (min-width: 992px) {
+    .dialog-responsive {
+        width: 70%;
+    }
+}
+
+@media (min-width: 1200px) {
+    .dialog-responsive {
+        width: 60%;
+    }
+}
+
+.saving {
+    display: block;
+    position: relative;
+    height: 10px;
+    width: 100%;
+    background: #fff;
+    overflow: hidden;
+}
+
+.saving:after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: #dcdcdc;
+    animation: 2s prog ease-in infinite;
+}
+
+@keyframes prog {
+    to {
+        width: 100%;
+    }
+}
+
+@media (min-width: 1300px) {
+    .img {
+        font-size: 150px;
+    }
+}
+
+.h5 {
+    font-size: 20px;
+}
+
+.h1 {
+    font-size: 50px;
+}
+
+.icon-aceptar {
+    font-size: 5rem !important;
+    color: #008080;
+}
+
+.icon-rechazar {
+    font-size: 5rem !important;
+    color: #fb5353;
+}

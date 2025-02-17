@@ -1,0 +1,49 @@
+<!-- =================================
+        VIEW CONFIGURACIÓN
+================================== -->
+<p-sidebar [(visible)]="sidebarVisible" position="right" [style]="{'width':'40%'}">
+
+
+    <!-- SECTOR HEADER -->
+    <div class="card-header shadow-5">
+        <h3>Configuración</h3>
+    </div>
+    <hr>
+
+    <!-- SECTOR BODY -->
+    <div class="card-body shadow-5">
+        <p>
+            Bienvenido al Sistema de de configuración de MINEXA. Seleccione los parámetros a configurar.
+        </p>
+
+        <p-accordion>
+            <p-accordionTab header="ACCESOS DIRECTOS">
+                <ul>
+                    <li>Acceso Directo 01</li>
+                    <li>Acceso Directo 02</li>
+                    <li>Acceso Directo 03</li>
+                </ul>
+            </p-accordionTab>
+            <p-accordionTab header="TEMAS">
+                <ul>
+                    <li>Tema 01</li>
+                    <li>Tema 02</li>
+                    <li>Tema 03</li>
+                </ul>
+            </p-accordionTab>
+            <p-accordionTab header="SEGURIDAD">
+                <ul>
+                    <li>Opción 01</li>
+                    <li>Opción 02</li>
+                    <li>Opción 03</li>
+                </ul>
+            </p-accordionTab>
+        </p-accordion>
+    </div>
+    <hr>
+
+    <!-- SECTOR FOOTER -->
+    <div class="card-footer">
+
+    </div>
+</p-sidebar>

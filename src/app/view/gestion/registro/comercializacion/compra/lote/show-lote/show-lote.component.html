@@ -1,0 +1,307 @@
+<!-- =================================
+        VIEW SHOW-LOTE
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="false" closable="false" header="DETALLE DE COMPRA" [modal]="true"
+    [maximizable]="true" [style]="{'width': '95vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+            <div>
+                <p-button pRipple label="Aceptar Compra" icon="pi pi-check" [text]="true" [raised]="true"
+                    severity="primary" [hidden]="!estadoLote" (click)="aceptarCompra()" [style]="{'width':'200px'}" />
+                &nbsp;
+                <p-button pRipple label="Rechazar Compra" icon="pi pi-times" [text]="true" [raised]="true"
+                    severity="warning" (click)="rechazarCompra()" [style]="{'width':'200px'}" />
+            </div>
+            <hr>
+            <div class="grid pb-3">
+
+                <!-- BODY-HEADER -->
+                <div class="col-12 sm:col-4">
+                    <!-- <div class="p-5"> -->
+                    <div class="card-body shadow-3" style="min-height: 1200px;">
+
+                        <!-- IMG MINERAL -->
+                        <div class=" text-center">
+                            <img [src]="lote.mineral.foto" alt="Foto-Mineral"
+                                style="width: 150px; height:150px; border-radius:100px; border:3px solid #dcdcdc" />
+
+                            <h2>LOTE: {{lote.numLote}}</h2>
+                            <hr>
+                            <hr>
+                        </div>
+
+                        <!-- MINERAL -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="mineral">Mineral : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="mineral" [(ngModel)]="lote.mineral.nombre"
+                                    class="w-full" [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <!-- SACOS -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="sacos">Sacos : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="sacos" [(ngModel)]="lote.sacos" class="w-full"
+                                    [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="fecha">FECHA : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="fecha" [(ngModel)]="lote.fechaHora" class="w-full"
+                                    [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <!-- COOPERATIVA -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="cooperativa">Cooperativa : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="cooperativa" [(ngModel)]="lote.cooperativa.nombre"
+                                    class="w-full" [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <!-- SOCIO -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="socio">Socio : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="socio" [(ngModel)]="lote.socio.nombre" class="w-full"
+                                    [disabled]="true" />
+                            </div>
+                        </div>
+
+                        <!-- PESO BRUTO -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="pesoBruto">Peso Bruto (Kg) : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="number" pInputText id="pesoBruto" [(ngModel)]="lote.pesoBruto"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- TARA -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="tara">Tara (Kg) : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="number" pInputText id="tara" [(ngModel)]="lote.tara" class="w-full"
+                                    [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- HUMEDAD -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-2">
+                                <label for="humedad">Humedad (Kg) : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="number" pInputText id="humedad" [(ngModel)]="lote.humedad" class="w-full"
+                                    [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- PESO NETO -->
+                        <div class="field grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="pesoNeto">Peso Neto (Kg) : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="number" pInputText id="pesoBruto"
+                                    [value]="lote.pesoBruto-lote.tara-lote.humedad" class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+
+                        <!-- MOLIENDERO -->
+                        <div class="grid">
+                            <div class="col-4 text-right pt-3">
+                                <label for="idMoliendero">Moliendero : </label>
+                            </div>
+                            <div class="col-8">
+                                <input type="text" pInputText id="idMoliendero" [value]="lote.moliendero?.nombre"
+                                    class="w-full" [disabled]="true">
+                            </div>
+                        </div>
+                        <hr>
+
+                        <!-- PRECIOS Y COSTOS -->
+                        <div class="card">
+                            <h5>PRECIOS TOTALES</h5>
+                            <hr>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 30%;"></th>
+                                        <th style="background: #dcdcdc; padding: 5px; width: 35%;">
+                                            $us.
+                                        </th>
+                                        <th style="background: #dcdcdc; padding: 5px; width: 35%;">
+                                            Bs.
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label>Bruto :&nbsp;</label>
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.mineralSus" class="text-right" />
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.mineralBs" class="text-right" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label>Regalia :&nbsp;</label>
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.regaliaSus" class="text-right" />
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.regaliaBs" class="text-right" />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label>Líquido :&nbsp;</label>
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.netoSus" class="text-right" />
+                                        </td>
+                                        <td>
+                                            <input type="text" pInputText id="mineral" class="w-full" [disabled]="true"
+                                                [(ngModel)]="costo.netoBs" class="text-right" />
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BODY-DETAIL -->
+                <div class="col-12 sm:col-8">
+                    <div class="card-body shadow-3" style="min-height: 1200px;">
+                        <p-tabView [(activeIndex)]="activeIndex">
+
+                            <!-- DESCUENTOS -->
+                            <p-tabPanel header="DESCUENTOS">
+                                <app-index-descuento [lote]="lote" [descuentos]="descuentos"
+                                    [deducciones]="deducciones"></app-index-descuento>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- COTIZACIONES -->
+                            <p-tabPanel header="COTIZACIONES">
+                                <app-index-costo [lote]="lote" [cotizacionMinerales]="cotizacionMinerales"
+                                    [cotizacion15Minerales]="cotizacion15Minerales"
+                                    [cotizacionDivisa]="cotizacionDivisa" [costos]="costos"
+                                    (changeCostos)="updateCostos($event)"></app-index-costo>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 0" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />&nbsp;
+                                    <p-button (onClick)="activeIndex = 2" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- LEYES -->
+                            <p-tabPanel header="LEYES">
+                                <app-index-ley [lote]="lote" [leyes]="leyes"
+                                    (changeLeyes)="updateLeyes($event)"></app-index-ley>
+                                <hr>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />&nbsp;
+                                    <p-button (onClick)="activeIndex = 3" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- SUB-LOTES -->
+                            <p-tabPanel header="LIQUIDACIONES">
+                                <app-index-subLote [lote]="lote" [subLotes]="subLotes" [costo]="costo"
+                                    (changeSubLote)="updateSubLotes($event)">
+                                </app-index-subLote>
+                                <hr>
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class=" text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 2" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Cerrando Compra...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Cerrar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

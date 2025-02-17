@@ -1,0 +1,214 @@
+<!-- =================================
+        VIEW DIALOG RECEPCION
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE RECEPCION" [modal]="true"
+    [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+
+            <!-- BODY HEADER -->
+            <div class="grid justify-content-center">
+                <div class="col-12 sm:col-10">
+                    <div class="grid">
+
+                        <!-- SUCURSAL ORIGEN -->
+                        <div class="col-12 sm:col-6">
+                            <div class="card">
+                                <h5>Sucursal Origen</h5>
+                                <hr>
+                                <!-- REGIONAL -->
+                                <div class="grid field">
+                                    <div class="col-4 text-right pt-2">
+                                        <label>Regional:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" pInputText id="regionalOrigen"
+                                            [(ngModel)]="recepcion.regional_origen.nombre" class="w-full"
+                                            [disabled]="true" />
+                                    </div>
+                                </div>
+
+                                <!-- SUCURSAL -->
+                                <div class="grid field">
+                                    <div class="col-4 text-right pt-2">
+                                        <label>Sucursal:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" pInputText id="sucursalOrigen"
+                                            [(ngModel)]="recepcion.sucursal_origen.nombre" class="w-full"
+                                            [disabled]="true" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SUCURSAL DESTINO -->
+                        <div class="col-12 sm:col-6">
+                            <div class="card">
+                                <h5>Sucursal Destino</h5>
+                                <hr>
+                                <!-- REGIONAL -->
+                                <div class="grid field">
+                                    <div class="col-4 text-right pt-2">
+                                        <label>Regional:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" pInputText id="regionalDestino"
+                                            [(ngModel)]="recepcion.regional_destino.nombre" class="w-full"
+                                            [disabled]="true" />
+                                    </div>
+                                </div>
+
+                                <!-- SUCURSAL -->
+                                <div class="grid field">
+                                    <div class="col-4 text-right pt-2">
+                                        <label>Sucursal:</label>
+                                    </div>
+                                    <div class="col-8">
+                                        <input type="text" pInputText id="sucursalDestino"
+                                            [(ngModel)]="recepcion.regional_destino.nombre" class="w-full"
+                                            [disabled]="true" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY DETAIL -->
+            <div class="card shadow-3">
+                <h5>Lotes a recepcionar</h5>
+                <hr>
+                <!-- TABLE -->
+                <p-table #dt [value]="recepcionLotes" [(selection)]="selected" [rows]="10"
+                    [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+                    [globalFilterFields]="['numLote','fechaHora','cooperativa.nombre','mineral.nombre','pesoBruto','estado']"
+                    [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+                    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                    [showCurrentPageReport]="true">
+
+                    <!-- TABLE BUTTONS -->
+                    <ng-template pTemplate="caption">
+                        <div class="grid">
+                            <div class="col-12 md:col-8">
+                            </div>
+                            <div class="col-12 md:col-4 text-right">
+                                <!-- BUSCAR -->
+                                <span class="p-input-icon-left">
+                                    <i class="pi pi-search"></i>
+                                    <input pInputText type="text"
+                                        (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                                        placeholder="Buscar..." class="w-full" />
+                                </span>
+                            </div>
+                        </div>
+                    </ng-template>
+
+                    <!-- TABLE HEADER -->
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width:15%">
+                                LOTE
+                            </th>
+                            <th style="width:30%">
+                                MINERAL
+                            </th>
+                            <th style="width:30%">
+                                PESO-BRUTO
+                            </th>
+                            <th style="width:20%">
+                                LEY
+                            </th>
+                            <th style="width: 10%" class="text-center"><p-tableHeaderCheckbox />
+                        </tr>
+                    </ng-template>
+
+                    <!-- TABLE BODY -->
+                    <ng-template pTemplate="body" let-lote>
+                        <tr>
+                            <td>
+                                <h2>{{lote.lote.numLote}}</h2>
+                            </td>
+                            <td>
+                                <span class="prefijoRow">NOMBRE: </span> {{lote.lote.mineral.nombre}}<br>
+                                <span class="prefijoRow">TARA: </span> {{lote.lote.tara}}<br>
+                                <span class="prefijoRow">HUMEDAD: </span> {{lote.lote.humedad}}
+                            </td>
+                            <td>
+                                <span class="prefijoRow">K-BRUTO: </span> {{lote.lote.pesoBruto}}<br>
+                                <span class="prefijoRow">K-NETO: </span>
+                                {{lote.lote.pesoBruto-(lote.lote.tara+lote.lote.humedad)}}
+                            </td>
+                            <td>
+                                @for (ley of lote.lote.leyes; track $index) {
+                                @for (detalle of ley.detalles; track $index) {
+                                <span class="prefijoRow">{{detalle.mineral.abreviatura}} : </span>{{detalle.valor}}
+                                {{detalle.unidad_medida_ley.abreviatura}}<br>
+                                }
+                                }
+                            </td>
+                            <td class="text-center">
+                                <p-tableCheckbox [value]="lote" />
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+                <!-- DESCRIPCIÓN ENVÍO-->
+                <div class="field">
+                    <h5>Descripción de envío:</h5>
+                    <textarea pInputTextarea id="descripcion" [(ngModel)]="recepcion.descripcionOrigen" rows="5"
+                        cols="20" class="w-full" [disabled]="true"></textarea>
+                </div>
+                <!-- DESCRIPCIÓN RECEPCIÓN-->
+                <div class="field">
+                    <h5>Descripción de recepcion:</h5>
+                    <textarea pInputTextarea id="descripcion" [(ngModel)]="recepcion.descripcionDestino" rows="5"
+                        cols="20" class="w-full"></textarea>
+                    <small class="p-error" *ngIf="!valDescripcion()">Requerido. Alfanumérico de: 1-500</small>
+                </div>
+            </div>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

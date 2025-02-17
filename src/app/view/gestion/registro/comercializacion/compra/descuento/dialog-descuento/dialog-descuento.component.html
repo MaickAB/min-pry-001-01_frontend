@@ -1,0 +1,54 @@
+<!-- =================================
+        VIEW DIALOG DESCUENTO
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRAR DESCUENTOS" [modal]="true"
+    [draggable]="false" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div class="card-body shadow-3">
+            <div class="grid">
+                <div class="col-4 text-center">
+                    <i class="pi pi-dollar pt-5" style="font-size: 100px"></i>
+                </div>
+                <div class="col-8">
+
+                    <!-- MONTO -->
+                    <div class="field">
+                        <label for="monto">Monto</label>
+                        <input type="number" pInputText id="monto" [(ngModel)]="descuento.monto" class="w-full" />
+                        <small class="p-error" *ngIf="!valMonto()">Requerido, Numérico.</small>
+                    </div>
+
+                    <!-- CONCEPTO -->
+                    <div class="field">
+                        <label for="concepto">Concepto</label>
+                        <textarea pInputTextarea id="Concepto" [(ngModel)]="descuento.concepto" rows="3" cols="20"
+                            class="w-full"></textarea>
+                        <small class="p-error" *ngIf="!valConcepto()">Requerido, Alfanumérico de 1-200.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,185 @@
+<!-- =================================
+        VIEW DIALOG COTIZACIÓN
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE COTIZACIONES DIARIAS"
+    [modal]="true" [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+            <div class="grid">
+
+                <!-- BODY-HEADER -->
+                <div class="col-12 sm:col-4">
+                    <div class="card shadow-3" style="min-height: 500px;">
+
+                        <!-- IMG -->
+                        <div class="text-center">
+                            <i class="pi pi-briefcase" style="font-size: 120px"></i>
+                            <hr>
+                            <hr>
+                        </div>
+
+                        <!-- FECHA -->
+                        <div class="field">
+                            <label for="fecha">Fecha</label>
+                            <input type="date" pInputText id="fecha" [(ngModel)]="cotizacion.fecha" class="w-full" />
+                            <small class="p-error" *ngIf="!valFecha()">Requerido, tipo Fecha.</small>
+                        </div>
+
+                        <!-- OBSERVACIONES -->
+                        <div class="field">
+                            <label for="observacion">Observaciones</label>
+                            <textarea pInputTextarea id="observacion" [(ngModel)]="cotizacion.observacion" rows="3"
+                                cols="20" class="w-full"></textarea>
+                            <small class="p-error" *ngIf="!valObservacion()">Opcional, Alfanumérico de
+                                0-200.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BODY-DETAIL -->
+                <div class="col-12 sm:col-8">
+                    <div class="card shadow-3" style="min-height: 500px;">
+                        <p-tabView [(activeIndex)]="activeIndex">
+
+                            <!-- TAP I -->
+                            <p-tabPanel header="MINERALES">
+                                <h5>Cotización diaria de Minerales</h5>
+                                <hr>
+                                <p-table [value]="detalleMinerales" [rowHover]="true" dataKey="id"
+                                    [tableStyle]="{'width': '100%'}">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 40%">MINERAL</th>
+                                            <!-- <th style="width: 25%">ULTIMA COTIZACIÓN</th> -->
+                                            <th style="width: 30%">COTIZACIÓN</th>
+                                            <th style="width: 30%">UNIDAD MEDIDA</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+                                        <tr>
+                                            <td>{{detalle.nombre}} ({{detalle.abreviatura}})</td>
+                                            <!-- <td>
+                                                @if(detalle.cotizacion){
+                                                <span class="prefijoRow">
+                                                    {{detalle.cotizacion.cotizacion.fecha | date:
+                                                    'dd-MM-yy'}}
+                                                </span><br>
+                                                <b>
+                                                    {{detalle.cotizacion ?
+                                                    detalle.cotizacion.valorCotizacion:''}}&nbsp;
+                                                    {{detalle.cotizacion.unidad_medida.abreviatura}}
+                                                </b>
+                                                }
+                                            </td> -->
+                                            <td>
+                                                <input type="hidden" pInputText [(ngModel)]="detalle.id" />
+                                                <input type="number" pInputText [(ngModel)]="detalle.valorCotizacion" />
+                                            </td>
+                                            <td>
+                                                <p-dropdown id="idUnidadMedida" [options]="unidadMedidas"
+                                                    optionValue="id" optionLabel="abreviatura"
+                                                    [(ngModel)]="detalle.idUnidadMedida" [appendTo]="'body'" />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 1" label="Siguiente" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-right" iconPos="right"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+
+                            <!-- TAB II -->
+                            <p-tabPanel header="DIVISA">
+                                <h5>Cotización diaria de Divisa</h5>
+                                <hr>
+                                <p-table [value]="detalleDivisas" dataKey="id" [rowHover]="true"
+                                    [tableStyle]="{'width': '100%'}">
+                                    <ng-template pTemplate="header">
+                                        <tr>
+                                            <th style="width: 40%">DIVISA</th>
+                                            <!-- <th style="width: 25%">ULTIMA COTIZACIÓN</th> -->
+                                            <th style="width: 30%">COTIZACIÓN</th>
+                                            <th style="width: 30%">UNIDAD MEDIDA</th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+                                        <tr>
+                                            <td>{{detalle.nombre}}&nbsp; ({{detalle.abreviatura}})</td>
+                                            <!-- <td>
+                                                @if(detalle.cotizacion){
+                                                <span class="prefijoRow">{{detalle.cotizacion ?
+                                                    (detalle.cotizacion.cotizacion.fecha |
+                                                    date:
+                                                    'dd-MM-yy'):''}}</span><br>
+                                                <b>{{detalle.cotizacion ? detalle.cotizacion.valor : ''}} Bs.</b>
+                                                }
+                                            </td> -->
+                                            <td>
+                                                <input type="hidden" pInputText [(ngModel)]="detalle.id" />
+                                                <input type="number" pInputText [(ngModel)]="detalle.valor" />
+                                            </td>
+                                            <td>
+                                                <input type="text" pInputText [disabled]="true" value="Bs." />
+                                            </td>
+                                        </tr>
+                                    </ng-template>
+                                </p-table>
+
+                                <!-- BUTTON DE NAVEGACIÓN -->
+                                <div class="text-right mt-3">
+                                    <p-button (onClick)="activeIndex = 0" label="Anterior" [rounded]="true"
+                                        [outlined]="true" severity="success" icon="pi pi-arrow-left" iconPos="left"
+                                        [style]="{'width': '130px'}" />
+                                </div>
+                            </p-tabPanel>
+                        </p-tabView>
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

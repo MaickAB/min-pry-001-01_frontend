@@ -1,0 +1,89 @@
+<!-- =================================
+        VIEW INDEX DEDUCCIÓN-GRAL
+================================== -->
+<!-- SECTOR BODY -->
+<div *ngIf="!loading">
+    <h5>Gestión de Deducciones Generales</h5>
+    <hr>
+    <!-- BODY DETAIL -->
+    <!-- TABLE -->
+    <p-table #dt [value]="deduccionesGral" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [paginator]="true"
+        [globalFilterFields]="['id','codigo','nombre', 'descripcion','fono']" [rowHover]="true" dataKey="id"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
+
+        <!-- TABLE BUTTONS -->
+        <ng-template pTemplate="caption">
+            <div class="grid">
+                <div class="col-12 sm:col-8 flex">
+                    <!-- NUEVO -->
+                    <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
+                        icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                    <!-- REPORTE -->
+                    <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info" label="Reporte"
+                        icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                </div>
+                <div class="col-12 sm:col-4 text-right">
+                    <!-- BUSCAR -->
+                    <span class="p-input-icon-left">
+                        <i class="pi pi-search"></i>
+                        <input pInputText type="text" (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                            placeholder="Buscar..." class="w-full" />
+                    </span>
+                </div>
+            </div>
+        </ng-template>
+
+        <!-- TABLE HEADER -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="nombre" style="width:50%">
+                    DEDUCCIÓN <p-sortIcon field="nombre" />
+                </th>
+                <th pSortableColumn="descripcion" style="width:15%">
+                    PORCENTAJE <p-sortIcon field="descripcion" />
+                </th>
+                <th pSortableColumn="descripcion" style="width:10%">
+                    VOL.<p-sortIcon field="descripcion" />
+                </th>
+                <th style="width:25%;">
+                    OPCIONES
+                </th>
+            </tr>
+        </ng-template>
+
+        <!-- BODY TABLE -->
+        <ng-template pTemplate="body" let-deduccion>
+            <tr>
+                <td>
+                    <span class="prefijoRow">CÓDIGO: </span>{{ deduccion.codigo }} <br>
+                    <span class="prefijoRow">NOMBRE: </span>{{ deduccion.nombre }}
+                </td>
+                <td>{{ deduccion.porcentaje }}</td>
+                <td>{{ deduccion.voluntario? 'SI':'NO'}}</td>
+                <td>
+                    <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        (click)="showReport(deduccion.id)" />
+                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        severity="success" (click)="showEdit(deduccion)" />
+                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="showDelete(deduccion.id)" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 50vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">MINEXA S.R.L.</span>
+    </div>
+</div>
+
+<!-- SECTOR FOOTER -->
+<div class="card-footer">
+    <app-dialog-deduccionGral (changeDeduccionGral)="show()"></app-dialog-deduccionGral>
+    <p-confirmDialog [style]="{ width: '450px' }" />
+    <!-- NOTIFICACIÓN -->
+    <p-toast />
+</div>

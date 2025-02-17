@@ -1,0 +1,92 @@
+<!-- =================================
+        VIEW EDIT EMPRESA 
+================================== -->
+
+<!-- SECTOR HEADER -->
+<div class="card-header shadow-3">
+    <h3 class="text-green-900">EMPRESA</h3>
+</div>
+
+<!-- SECTOR BODY -->
+<div class="card-body shadow-3">
+    <div *ngIf="!loading">
+        <div class="grid">
+            <div class="col-12 md:col-6">
+                <div class="card shadow-3" style="min-height: 500px;">
+
+                    <!-- NOMBRE -->
+                    <div class="field">
+                        <label for="name">Nombre</label>
+                        <input type="text" pInputText id="nombre" [(ngModel)]="empresa.nombre" class="w-full" />
+                        <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de 1-50.</small>
+                    </div>
+
+                    <!-- DESCRIPCIÓN -->
+                    <div class="field">
+                        <label for="descripcion">Description</label>
+                        <textarea pInputTextarea id="descripcion" [(ngModel)]="empresa.descripcion" rows="3" cols="20"
+                            class="w-full"></textarea>
+                        <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de 0-200.</small>
+                    </div>
+
+                    <!-- DIRECCIÓN -->
+                    <div class="field">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" pInputText id="direccion" [(ngModel)]="empresa.direccion" class="w-full" />
+                        <small class="p-error" *ngIf="!valDireccion()">Requerido, Alfanumérico de 1-200.</small>
+                    </div>
+
+                    <!-- FONO -->
+                    <div class="field">
+                        <label for="fono">Teléfono/Celular</label>
+                        <input type="text" pInputText id="fono" name="fono" [(ngModel)]="empresa.fono" class="w-full" />
+                        <small class="p-error" *ngIf="!valFono()">Requerido, Numérico.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 md:col-6">
+                <div class="card shadow-3" style="min-height: 500px;">
+                    <div class="flex flex-column gap-2">
+                        <!-- LOGO -->
+                        <label for="logo">Logo</label>
+                        <input type="file" pInputText id="logo" (change)="loadImg($event)" />
+                        <small class="p-error" *ngIf="!imgValida">Requerido, jpg, png
+                            max:5MB.</small>
+                        <div class="card mt-2" style="width: 100%; min-height: 300px;">
+                            <div *ngIf="imgUrl">
+                                <img [src]="imgUrl" alt="Vista previa de la imagen"
+                                    style="width: 100%; height: auto;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOADING -->
+    <div *ngIf="loading">
+        <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 50vh;">
+            <p-progressSpinner ariaLabel="loading" />
+            <span class="loader ps-5">MINEXA S.R.L.</span>
+        </div>
+    </div>
+</div>
+
+<!-- SECTOR FOOTER -->
+<div class="grid custom-footer">
+    <div class="col-6 text-left">
+        <div *ngIf="saving">
+            <h5>Guardando...</h5>
+            <span class="saving"></span>
+        </div>
+    </div>
+    <div class="col-6 text-right">
+        <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+            [hidden]="saving" (click)="save()" />
+        <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+            (click)="cancel()" />
+    </div>
+    <!-- NOTIFICACIÓN -->
+    <p-toast />
+</div>

@@ -1,0 +1,44 @@
+<!-- =================================
+    VIEW MODAL MINERAL-COMPLEJO
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="MINERALES COMPONENTES" [modal]="true"
+    styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div class="card shadow-3">
+            <p-table [value]="minerales" [(selection)]="selected" dataKey="id" [tableStyle]="{'width': '100%'}">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 20%">CODIGO</th>
+                        <th style="width: 20%">ABREVIATURA</th>
+                        <th style="width: 40%">NOMBRE</th>
+                        <th style="width: 20%" class="text-center"><p-tableHeaderCheckbox />
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-mineral>
+                    <tr>
+                        <td>{{mineral.codigo}}</td>
+                        <td>{{mineral.abreviatura}}</td>
+                        <td>{{mineral.nombre}}</td>
+                        <td class="text-center">
+                            <p-tableCheckbox [value]="mineral" />
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="custom-footer">
+            <p-button pRipple label="Aceptar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                (click)="save()" />
+            <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                (click)="cancel()" />
+        </div>
+    </ng-template>
+</p-dialog>

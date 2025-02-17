@@ -1,0 +1,175 @@
+<!-- =================================
+        VIEW INDEX RECEPCION
+================================== -->
+<!-- SECTOR HEADER -->
+<div class="card-header shadow-5">
+    <h3>Gestion de Recepciones</h3>
+</div>
+<hr>
+
+<!-- SECTOR BODY -->
+<div *ngIf="!loading">
+    <div class="card-body shadow-5">
+
+        <!-- BODY-HEADER -->
+        <div class="grid flex justify-content-center">
+            <div class="col-8">
+
+                <!-- REGIONAL -->
+                <div class="grid field">
+                    <div class="col-4 text-right pt-2">
+                        <label>Regional:</label>
+                    </div>
+                    <div class="col-8">
+                        <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
+                            [showClear]="true" (onChange)="filterByRegional($event.value)"
+                            (onClear)="clearFilterRegional()" [style]="{'width': '100%'}" placeholder="TODOS" />
+                    </div>
+                </div>
+                <!-- SUCURSAL -->
+                <div class="grid field">
+                    <div class="col-4 text-right pt-2">
+                        <label>Sucursal:</label>
+                    </div>
+                    <div class="col-8">
+                        <p-dropdown id="idSucursal" [options]="sucursales" optionValue="id" optionLabel="nombre"
+                            (onChange)="filterBySucursal($event.value)" [showClear]="true"
+                            (onClear)="clearFilterSucursal()" [style]="{'width': '100%'}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BODY DETAIL -->
+        <!-- TABLE -->
+        <p-table #dt [value]="recepciones" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
+            [globalFilterFields]="['numLote','fechaHora','cooperativa.nombre','mineral.nombre','pesoBruto','estado']"
+            [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [showCurrentPageReport]="true">
+
+            <!-- TABLE BUTTONS -->
+            <ng-template pTemplate="caption">
+                <div class="grid">
+                    <div class="col-12 md:col-8">
+
+                        <!-- REPORTE GENERAL -->
+                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
+                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="showReportGral()" />
+                    </div>
+                    <div class="col-12 md:col-4 text-right">
+                        <!-- BUSCAR -->
+                        <span class="p-input-icon-left">
+                            <i class="pi pi-search"></i>
+                            <input pInputText type="text"
+                                (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Buscar..."
+                                class="w-full" />
+                        </span>
+                    </div>
+                </div>
+            </ng-template>
+
+            <!-- TABLE HEADER -->
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="cooperativa.nombre" style="width:20%">
+                        DATOS-ORIGEN <p-sortIcon field="cooperativa.nombre" />
+                    </th>
+                    <th pSortableColumn="mineral.nombre" style="width:20%">
+                        DATOS-DESTINO <p-sortIcon field="mineral.nombre" />
+                    </th>
+                    <th pSortableColumn="mineral.nombre" style="width:20%">
+                        ESTADO-TRANSFERE.<p-sortIcon field="mineral.nombre" />
+                    </th>
+                    <th pSortableColumn="mineral.nombre" style="width:20%">
+                        ESTADO-RECEPCION <p-sortIcon field="mineral.nombre" />
+                    </th>
+                    <th style="width:20%;">
+                        OPCIONES
+                    </th>
+                </tr>
+            </ng-template>
+
+            <!-- TABLE BODY -->
+            <ng-template pTemplate="body" let-transferencia>
+                <tr>
+                    <td>
+                        <!-- DATOS ORIGEN -->
+                        <span class="prefijoRow">REGIONAL: </span>{{transferencia.regional_origen.nombre}} <br>
+                        <span class="prefijoRow">SUCURSAL: </span> {{transferencia.sucursal_origen.nombre}}
+                        <hr>
+                        <span class="prefijoRow">USUARIO: </span> {{transferencia.usuario_origen.login}} <br>
+                        <span class="prefijoRow">FECHA: </span> {{ transferencia.fechaHoraOrigen |
+                        date:'dd/MM/yyyy'}}<br>
+                        <span class="prefijoRow">HORA: </span> {{ transferencia.fechaHoraOrigen | date:'HH:mm:ss' }}
+                    </td>
+                    <td>
+                        <!-- DATOS DESTINO -->
+                        <span class="prefijoRow">REGIONAL: </span>{{transferencia.regional_destino.nombre }} <br>
+                        <span class="prefijoRow">SUCURSAL: </span> {{transferencia.sucursal_destino.nombre}}
+                        <hr>
+                        <span class="prefijoRow">USUARIO: </span>
+                        @if(transferencia.usuario_destino?.login){
+                        {{transferencia.usuario_destino?.login}} <br>
+                        }@else {
+                        <font color="red">Pendiente</font><br>
+                        }
+                        <span class="prefijoRow">FECHA: </span>
+                        @if(transferencia.fechaHoraDestino){
+                        {{ transferencia.fechaHoraDestino | date:'dd/MM/yyyy'}}<br>
+                        }@else {
+                        <font color="red">Pendiente</font><br>
+                        }
+                        <span class="prefijoRow">HORA: </span>
+                        @if(transferencia.fechaHoraDestino){
+                        {{ transferencia.fechaHoraDestino | date:'HH:mm:ss' }}
+                        }@else {
+                        <font color="red">Pendiente</font><br>
+                        }
+                    </td>
+                    <td>
+                        <!-- ESTADO DE TRANSFERENCIA -->
+                        @for (lote of transferencia.lotes; track $index) {
+                        <span class="prefijoRow">Lote: </span><b>{{lote.lote.numLote}}
+                        </b>{{lote.estadoTransferencia}}<br>
+                        }
+                    </td>
+                    <td>
+                        <!-- ESTADO DE RECEPCIÓN -->
+                        @for (lote of transferencia.lotes; track $index) {
+                        <span class="prefijoRow">Lote: </span><b>{{lote.lote.numLote}} </b>
+                        @if(lote.estadoRecepcion =='RECIBIDO'){
+                        {{lote.estadoRecepcion}}<br>
+                        }@else {
+                        <font color="red">Pendiente</font><br>
+                        }
+                        }
+                    </td>
+                    <td>
+                        <p-button pRipple icon="pi pi-eye" class="mr-2" [rounded]="true" [outlined]="true"
+                            severity="info" (click)="showReport(transferencia.id)" />
+                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                            severity="success" (click)="showEdit(transferencia.id)" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>
+<hr>
+
+<!-- SECTOR FOOTER -->
+<div class="card-footer">
+    <app-dialog-recepcion (changeRecepcion)="show()"></app-dialog-recepcion>
+    <p-confirmDialog [style]="{ width: '450px' }" />
+    <!-- NOTIFICACIÓN -->
+    <p-toast />
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 50vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">MINEXA S.R.L.</span>
+    </div>
+</div>

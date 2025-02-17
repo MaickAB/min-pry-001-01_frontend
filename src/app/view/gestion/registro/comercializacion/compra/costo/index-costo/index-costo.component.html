@@ -1,0 +1,115 @@
+<!-- ======================================
+    VIEW INDEX COSTO 
+======================================= -->
+<!-- SECTOR BODY -->
+<div class="grid">
+    <div class="col-6">
+        <h3><span class="prefijoRow">Cotizaciones</span></h3>
+    </div>
+    <div class="col-6 text-right">
+        @if(!costos.length){
+        <!-- NUEVO -->
+        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary" label="Agregar Cotización"
+            icon="pi pi-plus" (click)="showCreate()" [style]="{'width':'200px'}" />
+        }@else{
+        <!-- EDITAR -->
+        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary" label="Editar Cotización"
+            icon="pi pi-pencil" (click)="showEdit()" [style]="{'width':'200px'}" />
+        }
+    </div>
+</div>
+<hr>
+
+<div *ngIf="!loading">
+    <h5>Últimas Cotizaciones Quincenales</h5>
+    <hr>
+    <p-table [value]="costos" [rowHover]="true" dataKey="id">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 40%">MINERAL</th>
+                <th style="width: 20%">COTIZACIÓN</th>
+                <th style="width: 20%">REGALIA</th>
+                <th style="width: 20%">UNIDAD-MEDIDA</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-costo>
+            <tr>
+                <td>
+                    <b>
+                        {{costo.cotizacion15_mineral.mineral.nombre}} &nbsp;
+                        ({{costo.cotizacion15_mineral.mineral.abreviatura}})
+                    </b> <br>
+                    <span class="prefijoRow">FECHA: </span> {{costo.cotizacion15_mineral.cotizacion15.fecha}}
+                </td>
+                <td>
+                    {{costo.cotizacion15_mineral.valorCotizacion}}
+                </td>
+                <td>
+                    {{costo.cotizacion15_mineral.valorRegalia}}
+                </td>
+                <td>
+                    {{costo.cotizacion15_mineral.unidad_medida.abreviatura}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <hr>
+
+
+    <h5>Últimas Cotizaciones Diarias</h5>
+    <hr>
+    <p-table [value]="costos" dataKey="id" [tableStyle]="{'width': '100%'}">
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 40%">MINERAL</th>
+                <th style="width: 40%">COTIZACIÓN</th>
+                <th style="width: 20%">UNIDAD-MEDIDA</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-costo>
+            <tr>
+                <td>
+                    <b>
+                        {{costo.cotizacion_mineral.mineral.nombre}} &nbsp;
+                        ({{costo.cotizacion_mineral.mineral.abreviatura}})
+                    </b> <br>
+                    <span class="prefijoRow">FECHA: </span> {{costo.cotizacion_mineral.cotizacion.fecha}}
+                </td>
+                <td>
+                    {{costo.cotizacion_mineral.valorCotizacion}}
+                </td>
+                <td>
+                    {{costo.cotizacion_mineral.unidad_medida.abreviatura}}
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    <hr>
+    <div class="field grid">
+        <div class="col-8 text-right pt-3">
+            <label for="divisa">
+                DOLAR (US$):
+            </label>
+        </div>
+        <div class="col-4">
+            <input type="text" pInputText id="divisa"
+                [value]="(costos.length >0 ? costos[0]['cotizacion_divisa'].valor:'')+' Bs.'" class="w-full"
+                [disabled]="true">
+        </div>
+    </div>
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">Cargando...</span>
+    </div>
+</div>
+
+
+<!-- SECTOR FOOTER -->
+<app-dialog-costo (changeCosto)="show()"></app-dialog-costo>
+<p-confirmDialog [style]="{ width: '450px' }" />
+<!-- NOTIFICACIÓN -->
+<p-toast />

@@ -1,0 +1,107 @@
+<!-- =================================
+        VIEW DIALOG LEYES
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE LEY" [modal]="true"
+    styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+            <div class="card pb-3">
+
+                <!-- BODY-HEADER -->
+                <div class="grid flex justify-content-center">
+
+                    <!-- SOLICITANTE -->
+                    <div class="col-8">
+                        <div class="grid field">
+                            <div class="col-4 text-right pt-2">
+                                <label for="idSolicitante">Solicitante:</label>
+                            </div>
+                            <div class="col-8">
+                                <p-dropdown id="idSolicitante" [options]="solicitantes" [(ngModel)]="ley.idSolicitante"
+                                    optionValue="id" optionLabel="nombre" />
+                                <small class="p-error" *ngIf="!valIdSolicitante()">Requerido.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LABORATORIO -->
+                    <div class="col-8">
+                        <div class="grid field">
+                            <div class="col-4 text-right pt-2">
+                                <label for="idLaboratorio">Laboratorio:</label>
+                            </div>
+                            <div class="col-8">
+                                <p-dropdown id="idLaboratorio" [options]="laboratorios" optionValue="id"
+                                    optionLabel="nombre" [(ngModel)]="ley.idLaboratorio" />
+                                <small class="p-error" *ngIf="!valIdLaboratorio()">Requerido.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <!-- BODY-DETAIL -->
+                <div class="card shadow-3">
+                    <!-- TABLE -->
+                    <p-table [value]="leyDetalles" dataKey="id">
+                        <!-- TABLE HEADER -->
+                        <ng-template pTemplate="header">
+                            <tr>
+                                <th style="width:50%">MINERAL</th>
+                                <th style="width:30%">LEY</th>
+                                <th style="width:20%">U-MEDIDA</th>
+                            </tr>
+                        </ng-template>
+
+                        <!-- TABLE BODY -->
+                        <ng-template pTemplate="body" let-detalle let-i="rowIndex">
+                            <tr>
+                                <td>
+                                    {{ detalle.nombre }}&nbsp;({{detalle.abreviatura}})
+                                    <input type="hidden" pInputText [(ngModel)]="detalle.idMineral" />
+                                </td>
+                                <td>
+                                    <input type="text" pInputText [(ngModel)]="detalle.valor" class="w-full" />
+                                </td>
+                                <td>
+                                    <p-dropdown id="idUnidadMedidaLey" [options]="unidadMedidaLeys" optionValue="id"
+                                        optionLabel="abreviatura" [(ngModel)]="detalle.idUnidadMedidaLey"
+                                        [appendTo]="'body'" />
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                    [hidden]="saving" (click)="save()" />
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

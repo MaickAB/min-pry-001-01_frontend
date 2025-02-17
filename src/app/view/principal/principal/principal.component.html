@@ -1,0 +1,25 @@
+<!-- =================================
+            VIEW PRINCIPAL
+================================== -->
+<div class="layout-wrapper" [ngClass]="containerClass">
+
+  <!-- TOP-BAR -->
+  <app-topbar [roles]="roles" (changeRol)="showPermisos($event)" (changeRoles)="reload($event)"></app-topbar>
+
+  <!-- SIDE-BAR -->
+  <div class="layout-sidebar shadow-5">
+    <app-sidebar></app-sidebar>
+  </div>
+
+  <!-- MAIN (CONTENIDO) -->
+  <div class="layout-main-container">
+    <div class="card layout-main shadow-5">
+      <router-outlet></router-outlet>
+    </div>
+
+    <app-footer></app-footer>
+  </div>
+</div>
+
+<!-- MASCARA -->
+<div class="layout-mask"></div>

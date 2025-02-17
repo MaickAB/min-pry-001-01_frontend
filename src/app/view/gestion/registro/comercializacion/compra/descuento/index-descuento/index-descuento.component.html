@@ -1,0 +1,162 @@
+<!-- ======================================
+    VIEW INDEX DESCUENTOS 
+======================================= -->
+<!-- SECTOR BODY -->
+
+<!-- DEDUCCIONES-GENERALES -->
+<div *ngIf="false" class="grid">
+    <div class="col-12 sm:col-6">
+        <div class="card">
+            <h5>Deducciones Generales</h5>
+            <hr>
+            <!-- TABLE -->
+            <p-table [value]="deducciones">
+                <!-- TABLE HEADER -->
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width:50%">CONCEPTO</th>
+                        <th style="width:20%">PORCENTAJE</th>
+                        <th style="width:20%">MONTO</th>
+                    </tr>
+                </ng-template>
+
+                <!-- TABLE BODY -->
+                <ng-template pTemplate="body" let-deduccion>
+                    <tr>
+                        <td>{{ deduccion.deduccion.concepto}}</td>
+                        <td>{{ deduccion.deduccion.porcentaje }}</td>
+                        <td>{{ deduccion.deduccion.porcentaje }}</td>
+                    </tr>
+                </ng-template>
+
+                <!-- TABLE FOOTER -->
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>TOTALES:</strong></td>
+                        <td>{{ total('monto') }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+
+    <!-- DEDUCCIONES-COOPERATIVA -->
+    <div class="col-12 sm:col-6">
+        <div class="card">
+            <h5>Deducciones Cooperativa</h5>
+            <hr>
+            <!-- TABLE -->
+            <p-table [value]="deducciones">
+
+                <!-- TABLE HEADER -->
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width:50%">CONCEPTO</th>
+                        <th style="width:10%">PORCENTAJE</th>
+                        <th style="width:10%">MONTO</th>
+                    </tr>
+                </ng-template>
+
+                <!-- TABLE BODY -->
+                <ng-template pTemplate="body" let-deduccion>
+                    <tr>
+                        <td>{{ deduccion.deduccion.concepto}}</td>
+                        <td>{{ deduccion.deduccion.porcentaje }}</td>
+                        <td><b>{{ deduccion.deduccion.porcentaje }}</b></td>
+                    </tr>
+                </ng-template>
+
+                <!-- TABLE FOOTER -->
+                <ng-template pTemplate="footer">
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>TOTALES:</strong></td>
+                        <td>{{ total('monto') }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+        </div>
+
+    </div>
+</div>
+<!-- <hr> -->
+<div class="grid">
+    <div class="col-6">
+        <h3><span class="prefijoRow">Otros Descuentos</span></h3>
+    </div>
+    <div class="col-6 text-right">
+        <!-- NUEVO -->
+        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary" label="Agregar Descuento"
+            icon="pi pi-plus" (click)="showCreate()" [style]="{'width':'200px'}" />
+    </div>
+</div>
+<hr>
+
+<!-- OTROS DESCUENTOS -->
+<div *ngIf="!loading">
+    <!-- TABLE -->
+    <p-table [value]="descuentos" [rowHover]="true" dataKey="id">
+
+        <!-- TABLE HEADER -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="fechaHora" style="width:25%">
+                    FECHA <p-sortIcon field="fechaHora" />
+                </th>
+                <th pSortableColumn="concepto" style="width:30%">
+                    CONCEPTO <p-sortIcon field="concepto" />
+                </th>
+                <th pSortableColumn="monto" style="width:20%">
+                    MONTO <p-sortIcon field="monto" />
+                </th>
+                <th pSortableColumn="monto" style="width:25%">
+                    OPCIONES
+                </th>
+            </tr>
+        </ng-template>
+
+        <!-- TABLE BODY -->
+        <ng-template pTemplate="body" let-descuento>
+            <tr>
+                <td>
+                    <span class="prefijoRow">FECHA: </span>{{ descuento.fechaHora | date:'dd/MM/yyyy' }} <br>
+                    <span class="prefijoRow">HORA: </span>{{ descuento.fechaHora | date:'HH:mm:ss' }}
+                </td>
+                <td>{{ descuento.concepto }}</td>
+                <td>{{ descuento.monto }}</td>
+                <td>
+                    <p-button pRipple icon="pi pi-eye" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
+                        (click)="showDetail(descuento.id)" />
+                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
+                        severity="success" (click)="showEdit(descuento)" />
+                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        (click)="showDelete(descuento.id)" />
+                </td>
+            </tr>
+        </ng-template>
+
+        <!-- TABLE FOOTER -->
+        <ng-template pTemplate="footer">
+            <tr>
+                <td class="text-right" colspan="2"><strong>TOTALES:</strong></td>
+                <td>{{ total('monto') }}</td>
+                <td></td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<!-- LOADING -->
+<div *ngIf="loading">
+    <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+        <p-progressSpinner ariaLabel="loading" />
+        <span class="loader ps-5">Cargando...</span>
+    </div>
+</div>
+
+
+<!-- SECTOR FOOTER -->
+<app-dialog-descuento (changeDescuento)="show()"></app-dialog-descuento>
+<p-confirmDialog [style]="{ width: '450px' }" />
+<!-- NOTIFICACIÓN -->
+<p-toast />
