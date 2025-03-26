@@ -19,8 +19,8 @@
                             <label>Regional:</label>
                         </div>
                         <div class="col-6">
-                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
-                                [(ngModel)]="persona.idRegional" />
+                            <p-dropdown [disabled]="disabled" id="idRegional" [options]="regionales" optionValue="id"
+                                optionLabel="nombre" [(ngModel)]="persona.idRegional" />
                             <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
                         </div>
                     </div>
@@ -39,7 +39,8 @@
                             <!-- IMG-PERSONA -->
                             <div class="field">
                                 <label for="foto">Foto</label>
-                                <input type="file" pInputText id="foto" (change)="loadImg($event)" />
+                                <input [disabled]="disabled" type="file" pInputText id="foto"
+                                    (change)="loadImg($event)" />
                                 <small class="p-error" *ngIf="!imgValida">Requerido, jpg, png
                                     max:2MB.</small>
                                 <div *ngIf="imgUrl" class="pt-3">
@@ -57,15 +58,16 @@
                         <!-- DOCUMENTO -->
                         <div class="field">
                             <label for="documento">Carnet de Identidad</label>
-                            <input type="text" pInputText id="documento" [(ngModel)]="persona.documento"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="documento"
+                                [(ngModel)]="persona.documento" class="w-full" />
                             <small class="p-error" *ngIf="!valDocumento()">Requerido, Numérico.</small>
                         </div>
 
                         <!-- NOMBRE -->
                         <div class="field">
                             <label for="nombre">Nombre</label>
-                            <input type="text" pInputText id="nombre" [(ngModel)]="persona.nombre" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="nombre" [(ngModel)]="persona.nombre"
+                                class="w-full" />
                             <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de
                                 1-50.</small>
                         </div>
@@ -75,8 +77,8 @@
                                 <!-- APE-PATERNO -->
                                 <div class="field">
                                     <label for="apePaterno">Apellido Paterno</label>
-                                    <input type="text" pInputText id="apePaterno" [(ngModel)]="persona.apePaterno"
-                                        class="w-full" />
+                                    <input [disabled]="disabled" type="text" pInputText id="apePaterno"
+                                        [(ngModel)]="persona.apePaterno" class="w-full" />
                                     <small class="p-error" *ngIf="!valApePaterno()">Requerido, Alfanumérico
                                         de
                                         1-50.</small>
@@ -86,8 +88,8 @@
                                 <!-- APE-MATERNO -->
                                 <div class="field">
                                     <label for="apeMaterno">Apellido Materno</label>
-                                    <input type="text" pInputText id="apeMaterno" [(ngModel)]="persona.apeMaterno"
-                                        class="w-full" />
+                                    <input [disabled]="disabled" type="text" pInputText id="apeMaterno"
+                                        [(ngModel)]="persona.apeMaterno" class="w-full" />
                                     <small class="p-error" *ngIf="!valApeMaterno()">Opcional, Alfanumérico
                                         de
                                         0-50.</small>
@@ -100,8 +102,8 @@
                                 <!-- GENERO -->
                                 <div class="field">
                                     <label for="idGenero">Género</label>
-                                    <p-dropdown id="idGenero" [options]="tipoGeneros" optionValue="id"
-                                        optionLabel="nombre" [(ngModel)]="persona.idTipoGenero" />
+                                    <p-dropdown [disabled]="disabled" id="idGenero" [options]="tipoGeneros"
+                                        optionValue="id" optionLabel="nombre" [(ngModel)]="persona.idTipoGenero" />
                                     <small class="p-error" *ngIf="!valIdTipoGenero()">Requerido.</small>
                                 </div>
                             </div>
@@ -109,7 +111,8 @@
                                 <!-- FONO -->
                                 <div class="field">
                                     <label for="fono">Teléfono/Celular</label>
-                                    <input type="text" pInputText id="fono" [(ngModel)]="persona.fono" class="w-full" />
+                                    <input [disabled]="disabled" type="text" pInputText id="fono"
+                                        [(ngModel)]="persona.fono" class="w-full" />
                                     <small class="p-error" *ngIf="!valFono()">Requerido, Numérico.</small>
                                 </div>
                             </div>
@@ -118,16 +121,16 @@
                         <!-- TIPO DE PERSONA -->
                         <div class="field">
                             <label for="idTipoPersona">Tipo de Personal:</label>
-                            <p-dropdown id="idTipoPersona" [options]="tipoPersonas" [(ngModel)]="persona.idTipoPersona"
-                                optionValue="id" optionLabel="nombre" />
+                            <p-dropdown [disabled]="disabled" id="idTipoPersona" [options]="tipoPersonas"
+                                [(ngModel)]="persona.idTipoPersona" optionValue="id" optionLabel="nombre" />
                             <small class="p-error" *ngIf="!valIdTipoPersona()">Requerido.</small>
                         </div>
 
                         <!-- DIRECCIÓN -->
                         <div class="field">
                             <label for="direccion">Dirección</label>
-                            <input type="text" pInputText id="direccion" [(ngModel)]="persona.direccion"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="direccion"
+                                [(ngModel)]="persona.direccion" class="w-full" />
                             <small class="p-error" *ngIf="!valDireccion()">Requerido, Alfanumérico
                                 de
                                 1-200.</small>
@@ -136,8 +139,8 @@
                         <!-- DESCRIPCIÓN -->
                         <div class="field">
                             <label for="descripcion">Description</label>
-                            <textarea pInputTextarea id="descripcion" [(ngModel)]="persona.descripcion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                                [(ngModel)]="persona.descripcion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valDescripcion()">Opcional,
                                 Alfanumérico de
                                 0-200.</small>
@@ -177,8 +180,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('04.01.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('04.01.01') || hasPermission('04.01.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

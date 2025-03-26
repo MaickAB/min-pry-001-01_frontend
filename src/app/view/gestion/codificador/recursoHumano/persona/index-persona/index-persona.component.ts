@@ -1,7 +1,7 @@
 /* ==================================
       CONTROLLER INDEX PERSONA
 ================================== */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,8 +15,9 @@ import { PersonaService } from '../../../../../../service/gestion/codificador/re
 import { DialogPersonaComponent } from '../dialog-persona/dialog-persona.component';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DropdownModule } from 'primeng/dropdown';
-import { TipoPersona } from '../../../../../utility/models/utility/TipoPersona';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-persona',
@@ -31,6 +32,7 @@ export class IndexPersonaComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -44,6 +46,8 @@ export class IndexPersonaComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private personaService: PersonaService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -61,6 +65,7 @@ export class IndexPersonaComponent {
     this.personaService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.01');
         this.regionales = response.regionales;
         // BODY
         this.personas = response.personas;
@@ -70,6 +75,7 @@ export class IndexPersonaComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE -> Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -80,6 +86,11 @@ export class IndexPersonaComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -108,15 +119,11 @@ export class IndexPersonaComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -127,12 +134,17 @@ export class IndexPersonaComponent {
   // ---------------------------------------------
 
   // FILTER -> RECORDS BY ID-REGIONAL
-  filter(idRegional: number) {
-    this.personas = this.data.filter((val) => val.idRegional == idRegional);
+  filter(idParent: number) {
+    this.personas = this.data.filter((val) => val.idRegional == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.personas = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

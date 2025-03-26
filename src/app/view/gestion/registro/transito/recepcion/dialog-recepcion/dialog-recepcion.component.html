@@ -124,7 +124,9 @@
                             <th style="width:20%">
                                 LEY
                             </th>
-                            <th style="width: 10%" class="text-center"><p-tableHeaderCheckbox />
+                            <th style="width: 10%" class="text-center">
+                                <p-tableHeaderCheckbox [disabled]="disabled" />
+                            </th>
                         </tr>
                     </ng-template>
 
@@ -153,7 +155,7 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <p-tableCheckbox [value]="lote" />
+                                <p-tableCheckbox [disabled]="disabled" [value]="lote" />
                             </td>
                         </tr>
                     </ng-template>
@@ -168,8 +170,8 @@
                 <!-- DESCRIPCIÓN RECEPCIÓN-->
                 <div class="field">
                     <h5>Descripción de recepcion:</h5>
-                    <textarea pInputTextarea id="descripcion" [(ngModel)]="recepcion.descripcionDestino" rows="5"
-                        cols="20" class="w-full"></textarea>
+                    <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                        [(ngModel)]="recepcion.descripcionDestino" rows="5" cols="20" class="w-full"></textarea>
                     <small class="p-error" *ngIf="!valDescripcion()">Requerido. Alfanumérico de: 1-500</small>
                 </div>
             </div>
@@ -204,8 +206,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('07.02.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('07.02.01') || hasPermission('07.02.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

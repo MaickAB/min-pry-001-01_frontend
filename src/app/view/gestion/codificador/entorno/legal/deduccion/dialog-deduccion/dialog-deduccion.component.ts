@@ -16,6 +16,7 @@ import { DeduccionService } from '../../../../../../../service/gestion/codificad
 import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-deduccion',
@@ -30,6 +31,7 @@ export class DialogDeduccionComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
 
   // BODY
   deduccion!: Deduccion;
@@ -42,11 +44,13 @@ export class DialogDeduccionComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeDeduccion = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private deduccionService: DeduccionService) {
@@ -56,7 +60,9 @@ export class DialogDeduccionComponent {
   showCreate() {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
     // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('05.03');
     // BODY        
     this.deduccion = { codigo: '', concepto: '', porcentaje: '' };
     // FOOTER
@@ -69,10 +75,12 @@ export class DialogDeduccionComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.deduccionService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.03');
         // BODY        
         this.deduccion = response.deduccion;
         // FOOTER
@@ -83,11 +91,18 @@ export class DialogDeduccionComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
       }
     });
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
   }
 
   // STORE / UPDATE -> DATA
@@ -109,6 +124,7 @@ export class DialogDeduccionComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
 
@@ -126,6 +142,7 @@ export class DialogDeduccionComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -133,6 +150,11 @@ export class DialogDeduccionComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR REQUEST', detail: 'Datos Incorrectos...!!' });
       console.log('Datos Incorrectos...!!')
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -145,6 +167,11 @@ export class DialogDeduccionComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

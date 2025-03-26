@@ -36,6 +36,6 @@ export class WelcomeService {
   // OBTIENE -> CANTIDAD USERS
   public getCountUsers(): Observable<any> {
     console.log('REQUEST->welcome');
-    return this.httpClient.get('https://min-pry-001-01backend-production.up.railway.app/api/welcome/countUsers');
+    return this.httpClient.get('http://127.0.0.1:8000/api/welcome/countUsers');
   }
 }

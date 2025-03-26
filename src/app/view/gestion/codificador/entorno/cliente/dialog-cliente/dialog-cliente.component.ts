@@ -18,6 +18,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-cliente',
@@ -32,6 +33,7 @@ export class DialogClienteComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -45,11 +47,13 @@ export class DialogClienteComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeCliente = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private clienteService: ClienteService) {
@@ -60,10 +64,12 @@ export class DialogClienteComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.clienteService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.05');
         this.regionales = response.regionales;
         // BODY        
         this.cliente = { codigo: '', nombre: '', descripcion: '', fono: '' };
@@ -75,6 +81,7 @@ export class DialogClienteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -82,15 +89,23 @@ export class DialogClienteComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.clienteService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.05');
         this.regionales = response.regionales;
         // BODY        
         this.cliente = response.cliente;
@@ -102,6 +117,7 @@ export class DialogClienteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -128,6 +144,7 @@ export class DialogClienteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
 
@@ -146,6 +163,7 @@ export class DialogClienteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -153,6 +171,11 @@ export class DialogClienteComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR REQUEST', detail: 'Datos Incorrectos...!!' });
       console.log('Datos Incorrectos...!!')
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -165,6 +188,11 @@ export class DialogClienteComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

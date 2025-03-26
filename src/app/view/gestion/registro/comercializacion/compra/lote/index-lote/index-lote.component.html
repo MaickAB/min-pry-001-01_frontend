@@ -43,7 +43,7 @@
         <!-- BODY DETAIL -->
         <!-- TABLE -->
         <p-table #dt [value]="lotes" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
-            [globalFilterFields]="['numLote','fechaHora','cooperativa.nombre','mineral.nombre','pesoBruto','estado']"
+            [globalFilterFields]="['numLote','regional.nombre','sucursal.nombre','usuario.login','fechaHora','cooperativa.nombre','socio.nombre','mineral.nombre','pesoBruto','humedad','tara','estado_lote.nombre']"
             [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             [showCurrentPageReport]="true">
@@ -53,19 +53,20 @@
                 <div class="grid">
                     <div class="col-12 md:col-8">
                         <!-- NUEVO -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary"
-                            label="Nuevo" icon="pi pi-plus" (click)="showCreate()" />
+                        <p-button *ngIf="hasPermission('06.01.01')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="primary" label="Nuevo" icon="pi pi-plus" (click)="showCreate()" />
                         <!-- REPORTE GENERAL -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
-                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                        <p-button *ngIf="hasPermission('06.01.07')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="info" label="Reporte XLS" icon="pi pi-print" class="ml-2"
+                            (click)="exportXLS()" />
                     </div>
                     <div class="col-12 md:col-4 text-right">
-                        <!-- BUSCAR -->
+                        <!-- BUStruck -->
                         <span class="p-input-icon-left">
                             <i class="pi pi-search"></i>
                             <input pInputText type="text"
-                                (input)="dt.filterGlobal($any($event.target).value, 'contains')" placeholder="Buscar..."
-                                class="w-full" />
+                                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                                placeholder="Bustruck..." class="w-full" />
                         </span>
                     </div>
                 </div>
@@ -77,17 +78,17 @@
                     <th pSortableColumn="numLote" style="width:10%">
                         LOTE <p-sortIcon field="numLote" />
                     </th>
-                    <th pSortableColumn="fechaHora" style="width:25%">
-                        DATOS-COMPRA <p-sortIcon field="fechaHora" />
+                    <th pSortableColumn="regional.nombre" style="width:25%">
+                        DATOS-COMPRA <p-sortIcon field="regional.nombre" />
                     </th>
                     <th pSortableColumn="mineral.nombre" style="width:20%">
                         PRODUCTO <p-sortIcon field="mineral.nombre" />
                     </th>
-                    <th pSortableColumn="mineral.nombre" style="width:15%">
-                        SUBLOTES <p-sortIcon field="mineral.nombre" />
+                    <th pSortableColumn="sub_lotes" style="width:15%">
+                        SUBLOTES <p-sortIcon field="sub_lotes" />
                     </th>
-                    <th pSortableColumn="mineral.nombre" style="width:10%">
-                        ESTADO <p-sortIcon field="mineral.nombre" />
+                    <th pSortableColumn="estado_lote.nombre" style="width:10%">
+                        ESTADO <p-sortIcon field="estado_lote.nombre" />
                     </th>
                     <th style="width:20%;">
                         OPCIONES
@@ -106,7 +107,7 @@
                         <span class="prefijoRow">SUCURSAL: </span>{{lote.sucursal.nombre}} <br>
                         <hr>
                         <span class="prefijoRow">USUARIO: </span>{{lote.usuario.login}} <br>
-                        <span class="prefijoRow">FECHA: </span>{{ lote.fechaHora | date:'dd/MM/yyyy' }}<br>
+                        <span class="prefijoRow">FECHA: </span>{{ lote.fechaHora | date:'yyyy/MM/dd' }}<br>
                         <span class="prefijoRow">HORA: </span>{{ lote.fechaHora | date:'HH:mm:ss' }}
                         <hr>
                         <span class="prefijoRow">COOPERATIVA: </span>{{lote.cooperativa.nombre}} <br>
@@ -118,8 +119,8 @@
                         </span> <br>
                         <hr>
                         <span class="prefijoRow">K-BRUTO: </span> {{lote.pesoBruto}}<br>
-                        <span class="prefijoRow">TARA: </span> {{lote.tara}}<br>
                         <span class="prefijoRow">HUMEDAD: </span> {{lote.humedad}}<br>
+                        <span class="prefijoRow">TARA: </span> {{lote.tara}}<br>
                         <span class="prefijoRow">K-NETO: </span> {{lote.pesoBruto-(lote.tara+lote.humedad)}}
                         <hr>
                     </td>
@@ -135,25 +136,36 @@
                         @if(lote.estado_lote.codigo == '1.2' ||lote.estado_lote.codigo == '2.2'||lote.estado_lote.codigo
                         == '3.2'){
                         <h5>
+                            <div *ngIf="lote.estado_lote.codigo == '2.2'" class="text-center">
+                                <i class="pi pi-truck" style="font-size: 50px"></i>
+                            </div>
                             <span style="color: red;">{{ lote.estado_lote.nombre }}</span>
                         </h5>
                         }@else{
                         @if(lote.estado_lote.codigo == '1.1' ||lote.estado_lote.codigo == '2.1'||lote.estado_lote.codigo
                         == '3.1'){
                         <h5>
+                            <div *ngIf="lote.estado_lote.codigo == '2.1'" class="text-center">
+                                <i class="pi pi-truck" style="font-size: 50px"></i>
+                            </div>
                             <span style="color: green;">{{ lote.estado_lote.nombre }}</span>
                         </h5>
                         }@else{
+                        <div *ngIf="lote.estado_lote.codigo == '2'" class="text-center">
+                            <i class="pi pi-truck" style="font-size: 50px"></i>
+                        </div>
                         <h5>{{lote.estado_lote.nombre}}</h5>
                         }
                         }
                     </td>
                     <td>
-                        <p-button pRipple icon="pi pi-bars" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="info" (click)="showDetail(lote.id)" />
-                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="success" (click)="showEdit(lote.id)" />
-                        <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                        <p-button *ngIf="hasPermission('06.01.02')" pRipple icon="pi pi-eye" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(lote.id)" />
+                        <p-button *ngIf="hasPermission('06.01.03') && lote.estado_lote.codigo == 1" pRipple
+                            icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                            (click)="showEdit(lote.id)" />
+                        <p-button *ngIf="hasPermission('06.01.04') && lote.estado_lote.codigo == 1" pRipple
+                            icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                             (click)="showDelete(lote.id)" />
                     </td>
                 </tr>

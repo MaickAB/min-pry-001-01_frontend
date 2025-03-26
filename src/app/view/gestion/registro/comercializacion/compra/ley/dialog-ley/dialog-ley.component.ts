@@ -16,6 +16,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 
 import { DropdownModule } from 'primeng/dropdown';
 import { LeyService } from '../../../../../../../service/gestion/registro/comercializacion/compra/Ley.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 
@@ -31,45 +33,68 @@ export class DialogLeyComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  /* ATTRIBUTES
+-------------------------*/
+  // HEADER
+  permissions!: any[];
+
+  // BODY
   solicitantes!: any[];
   laboratorios!: any[];
   unidadMedidaLeys!: any[];
   ley!: any;
   leyDetalles!: any[];
+
+  // FOOTER
+  usuario!: any;
+  fechaHora!: any;
+
+  // SATATE
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
+
   @Output() changeLey = new EventEmitter();
 
   /* METHODS
   -------------------------*/
-  // INYECCIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
     private leyService: LeyService) {
   }
 
-  // MUESTRA -> VIEW CREATE
-  create(lote: any) {
+  // SHOW -> VIEW CREATE
+  showCreate(lote: any) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.leyService.create().subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
+        // BODY
         this.solicitantes = response.solicitantes;
         this.laboratorios = response.laboratorios;
         this.unidadMedidaLeys = response.unidadMedidaLeys;
-        this.ley = { idLote: lote.id, detalles: [] };
+        this.ley = { idLote: lote.id, idLaboratorio: null, detalles: [] };
         if (lote.mineral.minerales.length)
           this.leyDetalles = lote.mineral.minerales.map((m: any) => ({ nombre: m.mineral.nombre, abreviatura: m.mineral.abreviatura, idMineral: m.mineral.id, valor: null, idUnidadMedidaLey: null }));
         else
           this.leyDetalles = [{ nombre: lote.mineral.nombre, abreviatura: lote.mineral.abreviatura, idMineral: lote.mineral.id, valor: null, idUnidadMedidaLey: null }];
+        // FOOTER
+        this.usuario = this.principalService.getUsuarioStorage();
+        this.fechaHora = this.initReloj();
         console.log('RESPONSE->create', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -77,24 +102,38 @@ export class DialogLeyComponent {
     });
   }
 
-  // MUESTRA -> VIEW EDIT
-  edit(ley: any) {
+  // SHOW -> VIEW SHOW
+  showShow(ley: any) {
+    this.showEdit(ley);
+    this.disabled = true;
+  }
+
+  // SHOW -> VIEW EDIT
+  showEdit(ley: any) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', ley.id);
     this.leyService.edit(ley.id).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
+        // BODY
         this.solicitantes = response.solicitantes;
         this.laboratorios = response.laboratorios;
         this.unidadMedidaLeys = response.unidadMedidaLeys;
         this.ley = ley;
-        this.updateLeyDetalles(ley.detalles);
+        this.updateData(ley.detalles);
+        // FOOTER
+        this.usuario = this.principalService.getUsuarioStorage();
+        this.fechaHora = this.initReloj();
         console.log('RESPONSE->edit', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -102,7 +141,7 @@ export class DialogLeyComponent {
     });
   }
 
-  // GUARDA / ACTUALIZA -> REGISTRO
+  // STORE / UPDATE -> DATA
   save() {
     this.prepareData()
     if (this.validate()) {
@@ -121,6 +160,7 @@ export class DialogLeyComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -137,6 +177,7 @@ export class DialogLeyComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -146,29 +187,41 @@ export class DialogLeyComponent {
     }
   }
 
-  // CIERRA -> MODAL
+  // CLOSE -> MODAL
   cancel() {
     this.estado = false;
   }
 
-  // PREPARA -> DATA PARA ENVIAR A BACKEND.
+  // PREPARE -> DATA PARA ENVIAR A BACKEND.
   private prepareData() {
     this.ley.detalles = this.leyDetalles.map(d => ({ idMineral: d.idMineral, idUnidadMedidaLey: d.idUnidadMedidaLey, valor: d.valor }));
   }
 
-  // ACTUALIZA -> VALORES DE COTIZACIONES
-  private updateLeyDetalles(minerales: any) {
+  // UPDATE -> DATA SELECTED
+  private updateData(minerales: any) {
     this.leyDetalles = [];
     minerales.forEach((mineral: any) => {
       this.leyDetalles.push({ nombre: mineral.mineral.nombre, abreviatura: mineral.mineral.abreviatura, idMineral: mineral.idMineral, valor: mineral.valor, idUnidadMedidaLey: mineral.idUnidadMedidaLey });
     })
   }
 
+  // INIT -> FECHA CON RELOJ
+  private initReloj() {
+    setInterval(() => {
+      this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
+    }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
+
 
   /* VALIDADORES
   ---------------------------------------*/
   valIdSolicitante(): boolean { return this.ley.idSolicitante ? true : false }
-  valIdLaboratorio(): boolean { return this.ley.idLaboratorio ? true : false }
+  // valIdLaboratorio(): boolean { return this.ley.idLaboratorio ? true : false }
   // valValorLey() { const porcentaje = /^[\d.]{1,10}$/; return (porcentaje.test(this.ley.valorLey) ? true : false); }
-  validate() { if (!this.ley) { return 'Ley Vacio.' + false; } return (this.valIdSolicitante() && this.valIdLaboratorio()) }
+  validate() { if (!this.ley) { return 'Ley Vacio.' + false; } return (this.valIdSolicitante()) }
 }

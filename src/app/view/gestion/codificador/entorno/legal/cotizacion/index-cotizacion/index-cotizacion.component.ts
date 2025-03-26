@@ -14,6 +14,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DialogCotizacionComponent } from '../dialog-cotizacion/dialog-cotizacion.component';
 import { Cotizacion } from '../../../../../../utility/models/gestion/codificador/entorno/Cotizacion';
 import { CotizacionService } from '../../../../../../../service/gestion/codificador/entorno/legal/Cotizacion.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -29,6 +31,7 @@ export class IndexCotizacionComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HADER
+  permissions!: any[];
 
   // BODY
   cotizaciones!: Cotizacion[];
@@ -40,6 +43,8 @@ export class IndexCotizacionComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private cotizacionService: CotizacionService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -57,14 +62,15 @@ export class IndexCotizacionComponent {
     this.cotizacionService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.01');
         // BODY
         this.cotizaciones = response.cotizaciones;
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
-        this.cotizaciones = [];
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -75,6 +81,11 @@ export class IndexCotizacionComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -103,19 +114,20 @@ export class IndexCotizacionComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
-  }
-
   // EXPORTA -> DATA A XLS
   exportXLS() {
     alert('exportXLS');
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

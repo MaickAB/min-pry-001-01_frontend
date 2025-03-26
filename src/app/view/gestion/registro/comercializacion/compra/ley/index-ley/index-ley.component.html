@@ -9,8 +9,9 @@
     </div>
     <div class="col-6 text-right">
         <!-- NUEVO -->
-        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary" label="Agregar Ley"
-            icon="pi pi-plus" (click)="showCreate()" [style]="{'width':'200px'}" />
+        <p-button *ngIf="hasPermission('06.01.11.01') && lote.estado_lote.codigo == 1" pRipple [outlined]="true"
+            [raised]="true" [text]="true" severity="primary" label="Agregar Ley" icon="pi pi-plus"
+            (click)="showCreate()" [style]="{'width':'200px'}" />
     </div>
 </div>
 <hr>
@@ -46,7 +47,7 @@
                     {{ ley.solicitante.nombre }}
                     }
                 </td>
-                <td>{{ ley.laboratorio.nombre }}</td>
+                <td>{{ ley.laboratorio?.nombre}}</td>
                 <td>
                     @for (detalle of ley.detalles; track $index) {
                     <span class="prefijoRow">{{detalle.mineral?.abreviatura || ''}} : </span>
@@ -54,9 +55,13 @@
                     }
                 </td>
                 <td>
-                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        severity="success" (click)="showEdit(ley)" />
-                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                    <p-button *ngIf="hasPermission('06.01.11.02')" pRipple icon="pi pi-eye" class="mr-2"
+                        [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(ley)" />
+                    <p-button *ngIf="hasPermission('06.01.11.03') && lote.estado_lote.codigo == 1" pRipple
+                        icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                        (click)="showEdit(ley)" />
+                    <p-button *ngIf="hasPermission('06.01.11.04') && lote.estado_lote.codigo == 1" pRipple
+                        icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                         (click)="showDelete(ley.id)" />
                 </td>
             </tr>

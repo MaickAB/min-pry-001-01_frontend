@@ -20,24 +20,9 @@ export class DescuentoService {
     return this.httpClient.get<any>(this.url + 'index/' + idLote);
   }
 
-  // CREATE
-  public create(): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'create');
-  }
-
   // STORE
   public store(data: any): Observable<any> {
     return this.httpClient.post<any>(this.url + 'store', data);
-  }
-
-  // EDIT
-  public edit(id: number): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'edit/' + id);
-  }
-
-  // SHOW
-  public show(id: number): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'show/' + id);
   }
 
   // UPDATE
@@ -48,5 +33,9 @@ export class DescuentoService {
   // DESTROY
   public destroy(id: number): Observable<any> {
     return this.httpClient.delete<any>(this.url + 'destroy/' + id);
+  }
+  // REPORT
+  public report(id: number): Observable<any> {
+    return this.httpClient.get<any>(this.url + 'report/' + id);
   }
 }

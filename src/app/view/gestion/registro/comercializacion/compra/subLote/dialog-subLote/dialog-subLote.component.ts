@@ -13,11 +13,13 @@ import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-
 import { DropdownModule } from 'primeng/dropdown';
 import { AuxSubLote } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/AuxSubLote';
 import { Descuento } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/Descuento';
 import { SubLoteService } from '../../../../../../../service/gestion/registro/comercializacion/compra/SubLote.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
+import { ComunService } from '../../../../../../../service/utility/Comun.service';
 
 @Component({
   selector: 'app-dialog-subLote',
@@ -31,43 +33,78 @@ export class DialogSubLoteComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  //  HEADER 
+  permissions!: any[];
+
+  // BODY
   lote!: any;
   subLote!: any;
-  costo!: any;
   auxSubLote!: AuxSubLote;
+  reportPDF!: any;
+
+  // FOOTER
+  usuario!: any;
+  fechaHora!: any;
+
+  // STATE
   estado!: boolean;
+  loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeSubLote = new EventEmitter<Descuento>();
 
   /* METHODS
   -------------------------*/
-  // INYECCIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
-    private subLoteService: SubLoteService) {
+    private subLoteService: SubLoteService,
+    private comunService: ComunService) {
   }
 
-  // MUESTRA -> VIEW CREATE
-  create(lote: any, costo: any) {
-    this.lote = lote;
-    this.subLote = { idLote: lote.id, idSocio: 0, porcentaje: null };
-    this.costo = costo;
-    this.auxSubLote = { pesoBruto: 0, tara: 0, humedad: 0, pesoNeto: 0, costoMineralSus: 0, costoMineralBs: 0, costoRegaliaSus: 0, costoRegaliaBs: 0, totalDescuentos: 0, totalLiquidacion: 0 };
+  // SHOW -> VIEW CREATE
+  showCreate(lote: any) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
+    this.reportPDF = null;
+    // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
+    // BODY
+    this.lote = lote;
+    this.subLote = { idLote: lote.id, idSocio: 0, porcentaje: null };
+    this.auxSubLote = { pesoBruto: 0, tara: 0, humedad: 0, pesoNeto: 0 };
+    // FOOTER
+    this.usuario = this.principalService.getUsuarioStorage();
+    this.fechaHora = this.initReloj();
+
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(lote: any, subLote: any) {
+    this.showEdit(lote, subLote);
+    this.disabled = true;
   }
 
   // LOAD -> DATA EDIT
-  edit(lote: any, subLote: any, costo: any) {
-    this.lote = lote;
-    this.subLote = subLote;
-    this.costo = costo;
-    this.calcularAuxSubLote();
+  showEdit(lote: any, subLote: any) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
+    this.reportPDF = null;
+    // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
+    // BODY
+    this.lote = lote;
+    this.subLote = subLote;
+    this.calcularAuxSubLote();
+    // FOOTER
+    this.usuario = this.principalService.getUsuarioStorage();
+    this.fechaHora = this.initReloj();
   }
 
-  // GUARDA -> REGISTRO
+  // STORE / UPDATE -> DATA
   save() {
     if (this.validate()) {
       this.saving = true;
@@ -85,6 +122,7 @@ export class DialogSubLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -101,6 +139,7 @@ export class DialogSubLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -108,6 +147,26 @@ export class DialogSubLoteComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR', detail: 'Datos incorrectos...!!' });
       console.log('Datos Incorrectos...!!');
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    this.loading = true;
+    console.log('REQUEST->report', this.subLote.id);
+    this.subLoteService.report(this.subLote.id).subscribe({
+      next: (response) => {
+        this.reportPDF = this.comunService.formatPDF(response.reportPDF);
+        console.log('RESPONSE->report', response);
+      },
+      error: (error) => {
+        this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
+        console.log('RESPONSE->report Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
   }
 
   // CLOSE -> VIEW
@@ -121,34 +180,21 @@ export class DialogSubLoteComponent {
       pesoBruto: roundToTwo(this.lote.pesoBruto * (this.subLote.porcentaje / 100)),
       tara: roundToTwo(this.lote.tara * (this.subLote.porcentaje / 100)),
       humedad: roundToTwo(this.lote.humedad * (this.subLote.porcentaje / 100)),
-      pesoNeto: roundToTwo((this.lote.pesoBruto - this.lote.humedad - this.lote.tara) * (this.subLote.porcentaje / 100)),
-      costoMineralSus: roundToTwo(this.costo.mineralSus * (this.subLote.porcentaje / 100)),
-      costoMineralBs: roundToTwo(this.costo.mineralBs * (this.subLote.porcentaje / 100)),
-      costoRegaliaSus: roundToTwo(this.costo.regaliaSus * (this.subLote.porcentaje / 100)),
-      costoRegaliaBs: roundToTwo(this.costo.regaliaBs * (this.subLote.porcentaje / 100)),
-      totalDescuentos: 0,
-      totalLiquidacion: 0
+      pesoNeto: roundToTwo((this.lote.pesoBruto - this.lote.humedad - this.lote.tara) * (this.subLote.porcentaje / 100))
     };
-
-
   };
 
-  // let totalDeduccion = 0;
-  // this.deduccionSelected.forEach(deduccion => {
-  //   totalDeduccion += this.sublote.pesoNeto * parseFloat(deduccion.deduccion.porcentaje) / 100;
-  // });
-  // this.sublote.deduccion = roundToTwo(totalDeduccion);
+  // INIT -> FECHA CON RELOJ
+  private initReloj() {
+    setInterval(() => {
+      this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
+    }, 1000);
+  }
 
-  // let totalDescuento = 0;
-  // this.descuentos.forEach(descuento => {
-  //   totalDescuento += parseFloat(descuento.monto);
-  // });
-  // this.sublote.descuento = roundToTwo(totalDescuento);
-
-  // this.sublote.totalDescuento = roundToTwo(this.sublote.regalia + this.sublote.deduccion + this.sublote.descuento);
-  // this.sublote.totalLiquidacion = roundToTwo(this.sublote.totalPagar - this.sublote.totalDescuento);
-
-
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
 
   /* VALIDADORES
   ---------------------------------------*/

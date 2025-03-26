@@ -33,7 +33,7 @@
         <!-- BODY DETAIL -->
         <!-- TABLE -->
         <p-table #dt [value]="personas" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
-            [globalFilterFields]="['id','documento','nombre', 'direccion','fono']"
+            [globalFilterFields]="['documento','nombre','apePaterno','tipo.nombre','direccion','fono','asignacion','regional.nombre']"
             [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             [showCurrentPageReport]="true">
@@ -43,11 +43,12 @@
                 <div class="grid">
                     <div class="col-12 sm:col-8">
                         <!-- NUEVO -->
-                        <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
-                            icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                        <p-button *ngIf="hasPermission('04.01.01')" pRipple [outlined]="true" [raised]="true"
+                            severity="primary" label="Nuevo" icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
                         <!-- REPORTE -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
-                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                        <p-button *ngIf="hasPermission('04.01.07')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="info" label="Reporte XLS" icon="pi pi-print" class="ml-2"
+                            (click)="exportXLS()" />
                     </div>
                     <div class="col-12 sm:col-4 text-right">
                         <!-- BUSCAR -->
@@ -67,14 +68,14 @@
                     <th pSortableColumn="id" style="width:10%" class="text-center">
                         FOTO <p-sortIcon field="id" />
                     </th>
-                    <th pSortableColumn="documento" style="width:30%">
-                        DATOS PERSONAL <p-sortIcon field="documento" />
+                    <th pSortableColumn="nombre" style="width:35%">
+                        DATOS PERSONAL <p-sortIcon field="nombre" />
                     </th>
-                    <th pSortableColumn="nombre" style="width:20%">
-                        REPARTICIÓN <p-sortIcon field="nombre" />
+                    <th pSortableColumn="asignacion" style="width:20%;">
+                        ASIGNACIÓN <p-sortIcon field="asignacion" />
                     </th>
-                    <th pSortableColumn="nombre" style="width:20%;">
-                        ASIGNACIÓN <p-sortIcon field="nombre" />
+                    <th pSortableColumn="regional.nombre" style="width:15%">
+                        REGIONAL <p-sortIcon field="regional.nombre" />
                     </th>
                     <th style="width:20%;">
                         OPCIONES
@@ -92,12 +93,9 @@
                     <td>
                         <span class="prefijoRow">DOCUMENTO: </span>{{persona.documento}}<br />
                         <span class="prefijoRow">NOMBRE: </span>{{persona.nombre}} {{persona.apePaterno}}<br />
+                        <span class="prefijoRow">TIPO: </span>{{persona.tipo.nombre}}<br />
                         <span class="prefijoRow">DIRECCIÓN: </span>{{persona.direccion}}<br />
                         <span class="prefijoRow">TELÉFONO: </span>{{persona.fono}}
-                    </td>
-                    <td>
-                        <span class="prefijoRow">REGIONAL: </span>{{persona.regional.nombre}}<br />
-                        <span class="prefijoRow">TIPO: </span>{{persona.tipo.nombre}}
                     </td>
                     @if(persona.asignacion){
                     <td>
@@ -105,19 +103,17 @@
                     </td>
                     }@else{
                     <td>
-                        <font color="red"> No Asignado</font>
+                        <font color="red">Sin Acceso al Sistema</font>
                     </td>
-
                     }
-
-
+                    <td> {{persona.regional ? persona.regional.nombre:''}}</td>
                     <td>
-                        <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="info" (click)="showReport(persona.id)" />
-                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="success" (click)="showEdit(persona.id)" />
-                        <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                            (click)="showDelete(persona.id)" />
+                        <p-button *ngIf="hasPermission('04.01.02')" pRipple icon="pi pi-eye" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(persona.id)" />
+                        <p-button *ngIf="hasPermission('04.01.03')" pRipple icon="pi pi-pencil" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="success" (click)="showEdit(persona.id)" />
+                        <p-button *ngIf="hasPermission('04.01.04')" pRipple icon="pi pi-trash" severity="danger"
+                            [rounded]="true" [outlined]="true" (click)="showDelete(persona.id)" />
                     </td>
                 </tr>
             </ng-template>

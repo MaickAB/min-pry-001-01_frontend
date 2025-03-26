@@ -2,7 +2,7 @@ export interface Cotizacion15 {
     id?: number,
     fecha: string,
     observacion: string,
-    cotizacionmineral: CotMineral[],
+    cotizacion_mineral: CotMineral[],
     estado?: boolean
 }
 

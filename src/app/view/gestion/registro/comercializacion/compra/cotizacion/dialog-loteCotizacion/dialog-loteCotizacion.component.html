@@ -1,0 +1,151 @@
+<!-- =================================
+    VIEW DIALOG LOTE-COTIZACION
+================================== -->
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE COTIZACIONES" [modal]="true"
+    [draggable]="false" [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
+
+    <!-- SECTOR BODY -->
+    <ng-template pTemplate="content">
+        <hr>
+        <div *ngIf="!loading">
+
+            <!-- COTIZACIÓN-15 -->
+            <div class="card shadow-3">
+                <div class="grid">
+                    <div *ngIf="!loadingCot15" class="col-8 pt-3">
+                        <h5>Cotizaciones Quincenal</h5>
+                    </div>
+                    <div *ngIf="loadingCot15" class="col-8">
+                        <h5>Obteniendo Cotización...</h5>
+                        <span class="saving"></span>
+                    </div>
+                    <div class="col-4">
+                        <input type="date" pInputText id="fecha" [(ngModel)]="fechaCotizacion15" class="w-full"
+                            (ngModelChange)="getCotizacion15($event)" />
+                    </div>
+                </div>
+                <hr>
+                <p-table [value]="cotizacion15.cotizacion_mineral" dataKey="id" [tableStyle]="{'width': '100%'}">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 40%">MINERAL</th>
+                            <th style="width: 20%">COTIZACIÓN</th>
+                            <th style="width: 20%">UNIDAD-MEDIDA</th>
+                            <th style="width: 20%">REGALIA (%)</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-cotizacion>
+                        <tr>
+                            <td>
+                                {{cotizacion.mineral.nombre}} &nbsp; ({{cotizacion.mineral.abreviatura}})
+                            </td>
+                            <td>
+                                {{cotizacion.valorCotizacion}}
+                            </td>
+                            <td>
+                                {{cotizacion.unidad_medida.abreviatura}}
+                            </td>
+                            <td>
+                                {{cotizacion.valorRegalia}} %
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+            <hr>
+
+            <div class="card shadow-3">
+
+                <!-- COTIZACIÓN DIARIA -->
+                <div class="grid">
+                    <div *ngIf="!loadingCot" class="col-8 pt-3">
+                        <h5>Cotizaciones Diarias</h5>
+                    </div>
+                    <div *ngIf="loadingCot" class="col-8">
+                        <h5>Obteniendo Cotización...</h5>
+                        <span class="saving"></span>
+                    </div>
+                    <div class="col-4">
+                        <input type="date" pInputText id="fecha" [(ngModel)]="fechaCotizacion" class="w-full"
+                            (ngModelChange)="getCotizacion($event)" />
+                    </div>
+                </div>
+                <hr>
+                <p-table [value]="cotizacion.cotizacion_mineral" dataKey="id" [tableStyle]="{'width': '100%'}">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="width: 40%">MINERAL</th>
+                            <th style="width: 20%">COTIZACIÓN</th>
+                            <th style="width: 40%">UNIDAD-MEDIDA</th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-cotizacion>
+                        <tr>
+                            <td>
+                                {{cotizacion.mineral.nombre}} &nbsp; ({{cotizacion.mineral.abreviatura}})
+                            </td>
+                            <td>
+                                {{cotizacion.valorCotizacion}}
+                            </td>
+                            <td>
+                                {{cotizacion.unidad_medida.abreviatura}}
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table><br>
+
+                <!-- COTIZACIÓN DIVISA -->
+                <div class="field grid">
+                    <div class="col-10 text-right pt-3">
+                        <label for="divisa">{{cotizacion.cotizacion_divisa[0].divisa.nombre}} &nbsp;
+                            ({{cotizacion.cotizacion_divisa[0].divisa.abreviatura}}):
+                        </label>
+                    </div>
+                    <div class="col-2">
+                        <input type="text" pInputText id="divisa"
+                            [value]="(cotizacion.cotizacion_divisa[0].valor)+' Bs.'" class="w-full" [disabled]="true">
+                    </div>
+                </div>
+            </div>
+            <hr>
+
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- SECTOR FOOTER -->
+    <ng-template pTemplate="footer">
+        <div class="grid custom-footer">
+            <div class="col-6 text-left">
+                <div *ngIf="saving">
+                    <h5>Guardando...</h5>
+                    <span class="saving"></span>
+                </div>
+            </div>
+            <div class="col-6">
+                <span *ngIf="!loading">
+                    <p-button *ngIf="hasPermission('06.01.10.01') || hasPermission('06.01.10.03')" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
+                <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
+                    (click)="cancel()" />
+            </div>
+        </div>
+    </ng-template>
+</p-dialog>

@@ -23,26 +23,26 @@ export class AppMenuComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.principalService.getRolSelectedStorage()) {
-      this.showPermisos(this.principalService.getRolSelectedStorage().permisos);
+      this.show(this.principalService.getRolSelectedStorage().permisos);
     }
   }
 
   // PREPARA -> ARRAY DE PERMISOS
-  showPermisos(data: any[]) {
+  show(data: any[]) {
     const buildMenuModel = (data: any) => {
       const model: any = [];
       const map = new Map();
       data.forEach((item: any) => {
         // Initialize the parent item if it does not exist
-        if (!map.has(item.codigo)) {
-          map.set(item.codigo, {
+        if (!map.has(item.id)) {
+          map.set(item.id, {
             label: item.permiso,
             icon: item.icono,
             items: []
           });
         }
-        if (item.codigo.includes('.')) {
-          const parentCode = item.codigo.substring(0, item.codigo.lastIndexOf('.'));
+        if (item.id.includes('.')) {
+          const parentCode = item.id.substring(0, item.id.lastIndexOf('.'));
           if (map.has(parentCode)) {
             map.get(parentCode).items.push({
               label: item.permiso,
@@ -51,7 +51,7 @@ export class AppMenuComponent implements OnInit {
             });
           }
         } else {
-          model.push(map.get(item.codigo));
+          model.push(map.get(item.id));
         }
       });
       return model;

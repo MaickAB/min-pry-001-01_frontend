@@ -14,9 +14,9 @@ import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Socio } from '../../../../../../utility/models/gestion/codificador/entorno/Socio';
-import { SocioService } from '../../../../../../../service/gestion/codificador/entorno/Socio.service';
-import { Cooperativa } from '../../../../../../utility/models/gestion/codificador/entorno/Cooperativa';
+import { SocioService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/Socio.service';
 import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-socio',
@@ -30,6 +30,10 @@ export class DialogSocioComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  //  HEADER 
+  permissions!: any[];
+
+  // BODY
   socio!: Socio;
 
   // FOOTER
@@ -40,11 +44,13 @@ export class DialogSocioComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeSocio = new EventEmitter<Socio>();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private socioService: SocioService) {
@@ -54,7 +60,9 @@ export class DialogSocioComponent {
   showCreate(idCooperativa: any) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
     // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
     // BODY
     this.socio = { codigo: '', nombre: '', descripcion: '', fono: '', idCooperativa: idCooperativa };
     // FOOTER
@@ -62,11 +70,19 @@ export class DialogSocioComponent {
     this.fechaHora = this.initReloj();
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(socio: Socio) {
+    this.showEdit(socio);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(socio: Socio) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
     // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
     // BODY
     this.socio = socio;
     // FOOTER
@@ -93,6 +109,7 @@ export class DialogSocioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
 
@@ -111,6 +128,7 @@ export class DialogSocioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -118,6 +136,11 @@ export class DialogSocioComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR REQUEST', detail: 'Datos Incorrectos...!!' });
       console.log('Datos Incorrectos...!!')
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -130,6 +153,11 @@ export class DialogSocioComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

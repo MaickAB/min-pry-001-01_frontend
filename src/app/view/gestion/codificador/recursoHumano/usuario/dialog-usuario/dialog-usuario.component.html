@@ -25,8 +25,8 @@
                         <!-- PERSONA -->
                         <div class="field">
                             <label for="idTipoPersona">Personal:</label>
-                            <p-dropdown id="idTipoPersona" [options]="personas" [(ngModel)]="personaSelected"
-                                optionLabel="nombre" (onChange)="loadImg()">
+                            <p-dropdown [disabled]="disabled" id="idTipoPersona" [options]="personas"
+                                [(ngModel)]="personaSelected" optionLabel="nombre" (onChange)="loadImg()">
                                 <ng-template let-persona pTemplate="item">
                                     {{ persona.nombre }} {{ persona.apePaterno }}
                                 </ng-template>
@@ -37,15 +37,16 @@
                         <!-- FECHA INICIO -->
                         <div class="field">
                             <label for="fechaInicio">Fecha Inicio</label>
-                            <input type="date" pInputText id="fechaInicio" [(ngModel)]="usuario.fechaInicio"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="date" pInputText id="fechaInicio"
+                                [(ngModel)]="usuario.fechaInicio" class="w-full" />
                             <small class="p-error" *ngIf="!valFechaInicio()">Requerido. Tipo fecha.</small>
                         </div>
 
                         <!-- FECHA FIN -->
                         <div class="field">
                             <label for="fechaFin">Fecha Fin</label>
-                            <input type="date" pInputText id="fechaFin" [(ngModel)]="usuario.fechaFin" class="w-full" />
+                            <input [disabled]="disabled" type="date" pInputText id="fechaFin"
+                                [(ngModel)]="usuario.fechaFin" class="w-full" />
                             <!-- <small class="p-error" *ngIf="!valFechaFin()">Requerido, -->
                             <!-- Fecha.</small> -->
                         </div>
@@ -53,8 +54,8 @@
                         <!-- DESCRIPCIÓN -->
                         <div class="field">
                             <label for="descripcion">Decripción</label>
-                            <textarea pInputTextarea id="descripcion" [(ngModel)]="usuario.descripcion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                                [(ngModel)]="usuario.descripcion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valDescripcion()">Requerido. Alfanumérico de 0-200.</small>
                         </div>
                     </div>
@@ -73,36 +74,35 @@
                                     </div>
                                     <div class="col-12 sm:col-4">
                                         <div class="flex justify-content-end">
-                                            <p-button (onClick)="generarUser()" label="Generar" [rounded]="true"
-                                                [outlined]="true" severity="secondary" icon="pi pi-user" iconPos="left"
-                                                [style]="{'width': '130px'}" />
+                                            <p-button *ngIf="!disabled" (onClick)="generarUser()" label="Generar"
+                                                [rounded]="true" [outlined]="true" severity="secondary"
+                                                icon="pi pi-user" iconPos="left" [style]="{'width': '130px'}" />
                                         </div>
                                     </div>
-
-
                                 </div>
                                 <hr>
 
                                 <!-- LOGIN -->
                                 <div class="field">
                                     <label for="login">Usuasrio</label>
-                                    <input type="text" pInputText id="login" [(ngModel)]="usuario.login"
-                                        class="w-full" />
+                                    <input [disabled]="disabled" type="text" pInputText id="login"
+                                        [(ngModel)]="usuario.login" class="w-full" />
                                     <small class="p-error" *ngIf="!valLogin()">Requerido. </small>
                                 </div>
 
                                 <!-- PASSWORD -->
                                 <div class="field">
                                     <label for="password">Contraseña</label>
-                                    <p-password [(ngModel)]="usuario.password" [toggleMask]="true" id="password" />
+                                    <p-password [disabled]="disabled" [(ngModel)]="usuario.password" [toggleMask]="true"
+                                        id="password" />
                                     <!-- <small class="p-error" *ngIf="!valPassword()">Requerido. Min:8 caracteres.</small> -->
                                 </div>
 
                                 <!-- EMAIL -->
                                 <div class="field">
                                     <label for="email">Email</label>
-                                    <input type="text" pInputText id="email" [(ngModel)]="usuario.email"
-                                        class="w-full" />
+                                    <input [disabled]="disabled" type="text" pInputText id="email"
+                                        [(ngModel)]="usuario.email" class="w-full" />
                                     <small class="p-error" *ngIf="!valEmail()">Requerido. Tipo xxxx.&#64;minexa.com
                                     </small>
                                 </div>
@@ -128,8 +128,6 @@
                                     currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                                     [showCurrentPageReport]="true">
 
-                                    <!-- <p-table [value]="roles" [(selection)]="rolesSelected" dataKey="id"
-                                    [tableStyle]="{'width': '100%','height':'150px'}"> -->
                                     <ng-template pTemplate="header">
                                         <tr>
                                             <th pSortableColumn="nombre" style="width: 30%">
@@ -146,7 +144,7 @@
                                             <td>{{rol.nombre}}</td>
                                             <td>{{rol.descripcion}}</td>
                                             <td class="text-center">
-                                                <p-tableCheckbox [value]="rol" />
+                                                <p-tableCheckbox [value]="rol" [disabled]="disabled" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -182,7 +180,7 @@
                                             <td>{{sucursal.regional.nombre}}</td>
                                             <td>{{sucursal.nombre}}</td>
                                             <td class="text-center">
-                                                <p-tableCheckbox [value]="sucursal" />
+                                                <p-tableCheckbox [value]="sucursal" [disabled]="disabled" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -231,8 +229,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('04.03.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('04.03.01') || hasPermission('04.03.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

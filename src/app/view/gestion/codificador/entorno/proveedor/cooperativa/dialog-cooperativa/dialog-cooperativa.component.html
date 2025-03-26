@@ -98,8 +98,11 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="hasPermission('05.04.01') || hasPermission('05.04.03')" pRipple label="Guardar"
+                        icon="pi pi-check" [text]="true" [raised]="true" severity="primary" [hidden]="saving"
+                        (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

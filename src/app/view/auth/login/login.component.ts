@@ -40,7 +40,7 @@ export class LoginComponent {
 
   // VERIFICA -> CREDENCIALES USER
   autenticarUser() {
-    if (this.validarDatos(this.credencial)) {
+    if (this.validate(this.credencial)) {
       this.loading = true;
       console.log('REQUEST->login', this.credencial);
       this.authService.login(this.credencial).subscribe({
@@ -48,7 +48,7 @@ export class LoginComponent {
           this.messageService.add({ severity: 'success', summary: 'CONFIRMACIÓN', detail: response.msg });
           console.log('RESPONSE->login', response);
           setTimeout(async () => {
-            await this.navPantallaPrincipalUser(); // Redireccionar después de 3 segundos
+            await this.route.navigateByUrl('principal', { skipLocationChange: false }); // Redireccionar después de 3 segundos
           }, 1000);
         },
         error: (error) => {
@@ -62,13 +62,8 @@ export class LoginComponent {
     }
   }
 
-  // NAVEGA -> PANTALLA PRINCIPAL USER
-  navPantallaPrincipalUser() {
-    this.route.navigateByUrl('principal', { skipLocationChange: false });
-  }
-
   // VALIDA -> DATOS
-  validarDatos(user: any) {
+  validate(user: any) {
     if (!user) {
       return false;
     }

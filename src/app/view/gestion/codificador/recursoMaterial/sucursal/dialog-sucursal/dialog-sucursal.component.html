@@ -19,8 +19,8 @@
                             <label>Regional:</label>
                         </div>
                         <div class="col-6">
-                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
-                                [(ngModel)]="sucursal.idRegional" />
+                            <p-dropdown [disabled]="disabled" id="idRegional" [options]="regionales" optionValue="id"
+                                optionLabel="nombre" [(ngModel)]="sucursal.idRegional" />
                             <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
                         </div>
                     </div>
@@ -38,7 +38,7 @@
                         <!-- IMG-SUCURSAL -->
                         <div class="field">
                             <label for="foto">Foto</label>
-                            <input type="file" pInputText id="foto" (change)="loadImg($event)" />
+                            <input [disabled]="disabled" type="file" pInputText id="foto" (change)="loadImg($event)" />
                             <small class="p-error" *ngIf="!imgValida">Requerido, jpg, png
                                 max:2MB.</small>
                             <div *ngIf="imgUrl" class="pt-3">
@@ -56,16 +56,17 @@
                         <!-- NOMBRE -->
                         <div class="field">
                             <label for="nombre">Nombre</label>
-                            <input type="text" pInputText id="nombre" [(ngModel)]="sucursal.nombre" class="w-full" />
-                            <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de
-                                1-50.</small>
+                            <input [disabled]="disabled" type="text" pInputText id="nombre"
+                                [(ngModel)]="sucursal.nombre" class="w-full" />
+                            <!-- <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de
+                                1-50.</small> -->
                         </div>
 
                         <!-- DESCRIPCIÓN -->
                         <div class="field">
                             <label for="descripcion">Description</label>
-                            <textarea pInputTextarea id="descripcion" [(ngModel)]="sucursal.descripcion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                                [(ngModel)]="sucursal.descripcion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de
                                 0-200.</small>
                         </div>
@@ -73,8 +74,8 @@
                         <!-- DIRECCIÓN -->
                         <div class="field">
                             <label for="direccion">Dirección</label>
-                            <input type="text" pInputText id="direccion" [(ngModel)]="sucursal.direccion"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="direccion"
+                                [(ngModel)]="sucursal.direccion" class="w-full" />
                             <small class="p-error" *ngIf="!valDireccion()">Requerido, Alfanumérico de
                                 1-200.</small>
                         </div>
@@ -82,8 +83,8 @@
                         <!-- FONO -->
                         <div class="field">
                             <label for="fono">Teléfono/Celular</label>
-                            <input type="text" pInputText id="fono" name="fono" [(ngModel)]="sucursal.fono"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="fono" name="fono"
+                                [(ngModel)]="sucursal.fono" class="w-full" />
                             <small class="p-error" *ngIf="!valFono()">Requerido, Numérico.</small>
                         </div>
 
@@ -91,14 +92,14 @@
                         <div class="grid">
                             <div class="field col-6">
                                 <label for="numLoteInicio">Nº Lote Inicio</label>
-                                <input type="text" pInputText id="numLoteInicio" name="numLoteInicio"
-                                    [(ngModel)]="sucursal.numLoteInicio" class="w-full" />
+                                <input [disabled]="disabled" type="text" pInputText id="numLoteInicio"
+                                    name="numLoteInicio" [(ngModel)]="sucursal.numLoteInicio" class="w-full" />
                                 <small class="p-error" *ngIf="!valNumLoteInicio()">Requerido,
                                     Numérico.</small>
                             </div>
                             <div class="field col-6">
                                 <label for="numLoteFin">Nº Lote Fin</label>
-                                <input type="text" pInputText id="numLoteFin" name="numLoteFin"
+                                <input [disabled]="disabled" type="text" pInputText id="numLoteFin" name="numLoteFin"
                                     [(ngModel)]="sucursal.numLoteFin" class="w-full" />
                                 <small class="p-error" *ngIf="!valNumLoteFin()">Requerido,
                                     Numérico.</small>
@@ -138,8 +139,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('02.02.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('02.02.01') || hasPermission('02.02.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

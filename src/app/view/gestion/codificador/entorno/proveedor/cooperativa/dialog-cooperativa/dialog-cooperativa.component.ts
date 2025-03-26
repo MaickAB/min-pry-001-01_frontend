@@ -14,10 +14,11 @@ import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Cooperativa } from '../../../../../../utility/models/gestion/codificador/entorno/Cooperativa';
-import { CooperativaService } from '../../../../../../../service/gestion/codificador/entorno/Cooperativa.service';
+import { CooperativaService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/Cooperativa.service';
 import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
 import { Regional } from '../../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
 import { DropdownModule } from 'primeng/dropdown';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-cooperativa',
@@ -32,6 +33,7 @@ export class DialogCooperativaComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -50,6 +52,7 @@ export class DialogCooperativaComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private cooperativaService: CooperativaService) {
@@ -64,6 +67,7 @@ export class DialogCooperativaComponent {
     this.cooperativaService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.04');
         this.regionales = response.regionales;
         // BODY        
         this.cooperativa = { codigo: '', nombre: '', descripcion: '' };
@@ -75,6 +79,7 @@ export class DialogCooperativaComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -91,6 +96,7 @@ export class DialogCooperativaComponent {
     this.cooperativaService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.04');
         this.regionales = response.regionales;
         // BODY        
         this.cooperativa = response.cooperativa;
@@ -102,6 +108,7 @@ export class DialogCooperativaComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -128,6 +135,7 @@ export class DialogCooperativaComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -145,6 +153,7 @@ export class DialogCooperativaComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -166,6 +175,10 @@ export class DialogCooperativaComponent {
     }, 1000);
   }
 
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
 
   /* VALIDADORES
   ---------------------------------------*/

@@ -6,10 +6,10 @@ export interface Rol {
     permisos: Permiso[],
     estado?: boolean
 }
-
 interface Permiso {
-    id: number
+    id?: string
 }
+
 
 
 

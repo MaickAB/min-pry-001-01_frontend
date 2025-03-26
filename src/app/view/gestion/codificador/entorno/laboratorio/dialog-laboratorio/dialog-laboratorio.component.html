@@ -19,8 +19,8 @@
                             <label>Regional:</label>
                         </div>
                         <div class="col-6">
-                            <p-dropdown id="idRegional" [options]="regionales" optionValue="id" optionLabel="nombre"
-                                [(ngModel)]="laboratorio.idRegional" />
+                            <p-dropdown [disabled]="disabled" id="idRegional" [options]="regionales" optionValue="id"
+                                optionLabel="nombre" [(ngModel)]="laboratorio.idRegional" />
                             <small class="p-error" *ngIf="!valIdRegional()">Requerido.</small>
                         </div>
                     </div>
@@ -43,22 +43,24 @@
                         <!-- CODIGO -->
                         <div class="field">
                             <label for="codigo">Código</label>
-                            <input type="text" pInputText id="codigo" [(ngModel)]="laboratorio.codigo" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="codigo"
+                                [(ngModel)]="laboratorio.codigo" class="w-full" />
                             <small class="p-error" *ngIf="!valCodigo()">Requerido, Alfanumérico de 1-20.</small>
                         </div>
 
                         <!-- NOMBRE -->
                         <div class="field">
                             <label for="nombre">Nombre</label>
-                            <input type="text" pInputText id="nombre" [(ngModel)]="laboratorio.nombre" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="nombre"
+                                [(ngModel)]="laboratorio.nombre" class="w-full" />
                             <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de 1-50.</small>
                         </div>
 
                         <!-- DESCRIPCIÓN -->
                         <div class="field">
                             <label for="descripcion">Description</label>
-                            <textarea pInputTextarea id="descripcion" [(ngModel)]="laboratorio.descripcion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                                [(ngModel)]="laboratorio.descripcion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de
                                 0-200.</small>
                         </div>
@@ -69,7 +71,8 @@
                                 <label for="porcentaje">Teléfono :</label>
                             </div>
                             <div class="col-6">
-                                <input type="text" pInputText id="fono" [(ngModel)]="laboratorio.fono" class="w-full" />
+                                <input [disabled]="disabled" type="text" pInputText id="fono"
+                                    [(ngModel)]="laboratorio.fono" class="w-full" />
                                 <small class="p-error" *ngIf="!valFono()">Opcional, Numérico de 0-10.</small>
                             </div>
                         </div>
@@ -108,8 +111,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('05.06.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('05.06.01') || hasPermission('05.06.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

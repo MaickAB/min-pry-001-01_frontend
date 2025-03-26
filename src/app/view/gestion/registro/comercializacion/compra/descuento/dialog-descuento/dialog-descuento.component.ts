@@ -15,6 +15,9 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Descuento } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/Descuento';
 import { DescuentoService } from '../../../../../../../service/gestion/registro/comercializacion/compra/Descuento.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
+import { ComunService } from '../../../../../../../service/utility/Comun.service';
 
 
 @Component({
@@ -29,34 +32,69 @@ export class DialogDescuentoComponent {
 
   /* ATTRIBUTES
   -------------------------*/
-  descuento!: Descuento;
+  //  HEADER 
+  permissions!: any[];
+
+  // BODY
+  descuento!: any;
+  reportPDF!: any;
+
+  // FOOTER
+  usuario!: any;
+  fechaHora!: any;
+
+  // STATE
   estado!: boolean;
+  loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeDescuento = new EventEmitter<Descuento>();
 
   /* METHODS
   -------------------------*/
-  // INYECCIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
-    private descuentoService: DescuentoService) {
+    private descuentoService: DescuentoService,
+    private comunService: ComunService) {
   }
 
-  // MUESTRA -> VIEW CREATE
-  create(idLote: any) {
+  // SHOW -> VIEW CREATE
+  showCreate(idLote: any) {
+    this.estado = true;
+    this.saving = false;
+    this.disabled = false;
+    // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
+    // BODY
     this.descuento = { idLote: idLote, monto: '', concepto: '' };
-    this.estado = true;
-    this.saving = false;
+    // FOOTER
+    this.usuario = this.principalService.getUsuarioStorage();
+    this.fechaHora = this.initReloj();
   }
 
-  // LOAD -> DATA EDIT
-  edit(descuento: Descuento) {
+  // SHOW -> VIEW SHOW
+  showShow(descuento: Descuento) {
+    this.showEdit(descuento);
+    this.disabled = true;
+  }
+
+  // SHOW -> VIEW EDIT
+  showEdit(descuento: Descuento) {
+    this.estado = true;
+    this.saving = false;
+    this.disabled = false;
+    // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
+    // BODY
     this.descuento = descuento;
-    this.estado = true;
-    this.saving = false;
+    // FOOTER
+    this.usuario = this.principalService.getUsuarioStorage();
+    this.fechaHora = this.initReloj();
   }
 
-  // GUARDA -> REGISTRO
+  // STORE / UPDATE -> DATA
   save() {
     if (this.validate()) {
       this.saving = true;
@@ -74,6 +112,7 @@ export class DialogDescuentoComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -90,6 +129,7 @@ export class DialogDescuentoComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -99,9 +139,41 @@ export class DialogDescuentoComponent {
     }
   }
 
+  // GENERATE -> REPORT
+  report() {
+    this.loading = true;
+    console.log('REQUEST->report', this.descuento.id);
+    this.descuentoService.report(this.descuento.id).subscribe({
+      next: (response) => {
+        this.reportPDF = this.comunService.formatPDF(response.reportPDF);
+        console.log('RESPONSE->report', response);
+      },
+      error: (error) => {
+        this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
+        console.log('RESPONSE->report Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
+      },
+      complete: () => {
+        this.loading = false;
+      }
+    });
+  }
+
   // CIERRA -> MODAL
   cancel() {
     this.estado = false;
+  }
+
+  // INIT -> FECHA CON RELOJ
+  private initReloj() {
+    setInterval(() => {
+      this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
+    }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

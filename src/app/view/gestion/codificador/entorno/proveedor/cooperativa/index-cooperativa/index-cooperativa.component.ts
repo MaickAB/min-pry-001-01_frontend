@@ -13,10 +13,12 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Cooperativa } from '../../../../../../utility/models/gestion/codificador/entorno/Cooperativa';
 import { DialogCooperativaComponent } from '../dialog-cooperativa/dialog-cooperativa.component';
-import { CooperativaService } from '../../../../../../../service/gestion/codificador/entorno/Cooperativa.service';
+import { CooperativaService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/Cooperativa.service';
 import { ShowCooperativaComponent } from '../show-cooperativa/show-cooperativa.component';
 import { Regional } from '../../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
 import { DropdownModule } from 'primeng/dropdown';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-cooperativa',
@@ -32,6 +34,7 @@ export class IndexCooperativaComponent implements OnInit {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -46,6 +49,8 @@ export class IndexCooperativaComponent implements OnInit {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private cooperativaService: CooperativaService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -63,6 +68,7 @@ export class IndexCooperativaComponent implements OnInit {
     this.cooperativaService.index().subscribe({
       next: (response) => {
         // HEAD
+        this.permissions = this.principalService.getPermissionsStorage('05.04');
         this.regionales = response.regionales;
         // BODY
         this.cooperativas = response.cooperativas;
@@ -70,9 +76,9 @@ export class IndexCooperativaComponent implements OnInit {
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
-        this.cooperativas = [];
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -84,6 +90,12 @@ export class IndexCooperativaComponent implements OnInit {
   showCreate() {
     this.dialog.showCreate();
   }
+
+  // SHOW -> VIEW SHOW  
+  showShow(id: number) {
+    this.detail.show(id);
+  }
+
 
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
@@ -111,15 +123,11 @@ export class IndexCooperativaComponent implements OnInit {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW DETAIL
-  showDetail(id: number) {
-    this.detail.show(id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -130,12 +138,17 @@ export class IndexCooperativaComponent implements OnInit {
   // ---------------------------------------------
 
   // FILTER -> RECORDS BY ID-REGIONAL
-  filter(idRegional: number) {
-    this.cooperativas = this.data.filter((val) => val.idRegional == idRegional);
+  filter(idParent: number) {
+    this.cooperativas = this.data.filter((val) => val.idRegional == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.cooperativas = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

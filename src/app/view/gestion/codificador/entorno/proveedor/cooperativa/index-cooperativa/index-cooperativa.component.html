@@ -33,8 +33,8 @@
         <!-- BODY DETAIL -->
         <!-- TABLE -->
         <p-table #dt [value]="cooperativas" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [paginator]="true"
-            [globalFilterFields]="['id','codigo','nombre', 'descripcion']" [tableStyle]="{ 'min-width': '75rem' }"
-            [rowHover]="true" dataKey="id"
+            [globalFilterFields]="['codigo','nombre', 'descripcion','socios','deducciones_coop','regional.nombre']"
+            [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             [showCurrentPageReport]="true">
 
@@ -43,11 +43,12 @@
                 <div class="grid">
                     <div class="col-12 sm:col-8">
                         <!-- NUEVO -->
-                        <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
-                            icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                        <p-button *ngIf="hasPermission('05.04.01')" pRipple [outlined]="true" [raised]="true"
+                            severity="primary" label="Nuevo" icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
                         <!-- REPORTE -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
-                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                        <p-button *ngIf="hasPermission('05.04.07')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="info" label="Reporte XLS" icon="pi pi-print" class="ml-2"
+                            (click)="exportXLS()" />
                     </div>
                     <div class="col-12 sm:col-4 text-right">
                         <!-- BUSCAR -->
@@ -67,14 +68,14 @@
                     <th pSortableColumn="id" style="width:10%" class="text-center">
                         FOTO <p-sortIcon field="id" />
                     </th>
-                    <th pSortableColumn="nombre" style="width:40%">
+                    <th pSortableColumn="nombre" style="width:35%">
                         COOPERATIVA <p-sortIcon field="nombre" />
                     </th>
-                    <th pSortableColumn="descripcion" style="width:15%">
-                        DEDUCCIONES <p-sortIcon field="descripcion" />
+                    <th pSortableColumn="socios" style="width:20%">
+                        DETALLE <p-sortIcon field="socios" />
                     </th>
-                    <th pSortableColumn="descripcion" style="width:15%">
-                        SOCIOS <p-sortIcon field="descripcion" />
+                    <th pSortableColumn="regional.nombre" style="width:15%">
+                        REGIONAL <p-sortIcon field="regional.nombre" />
                     </th>
                     <th style="width:20%;">
                         OPCIONES
@@ -97,18 +98,19 @@
                         <span class="prefijoRow">DESCRIPCIÓN: </span>{{ cooperativa.descripcion }}
                     </td>
                     <td>
-                        <span class="prefijoRow">TOTAL: </span> <b>{{ cooperativa.deducciones_coop.length }}</b>
+                        <span class="prefijoRow">DEDUCCIONES: </span>{{ cooperativa.deducciones_coop.length }}<br>
+                        <span class="prefijoRow">SOCIOS: </span>{{ cooperativa.socios.length }}
                     </td>
                     <td>
-                        <span class="prefijoRow">TOTAL: </span> <b>{{ cooperativa.socios.length }}</b>
+                        {{ cooperativa.regional.nombre }}
                     </td>
                     <td>
-                        <p-button pRipple icon="pi pi-bars" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="info" (click)="showDetail(cooperativa.id)" />
-                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="success" (click)="showEdit(cooperativa.id)" />
-                        <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                            (click)="showDelete(cooperativa.id)" />
+                        <p-button *ngIf="hasPermission('05.04.02')" pRipple icon="pi pi-eye" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(cooperativa.id)" />
+                        <p-button *ngIf="hasPermission('05.04.03')" pRipple icon="pi pi-pencil" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="success" (click)="showEdit(cooperativa.id)" />
+                        <p-button *ngIf="hasPermission('05.04.04')" pRipple icon="pi pi-trash" severity="danger"
+                            [rounded]="true" [outlined]="true" (click)="showDelete(cooperativa.id)" />
                     </td>
                 </tr>
             </ng-template>

@@ -1,5 +1,5 @@
 <!-- =================================
-        VIEW INDEX DEDUCCION-COP
+        VIEW INDEX DEDUCCION-COOP
 ================================== -->
 <!-- SECTOR BODY -->
 <div *ngIf="!loading">
@@ -8,7 +8,7 @@
     <!-- BODY DETAIL -->
     <!-- TABLE -->
     <p-table #dt [value]="deduccionesCoop" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [paginator]="true"
-        [globalFilterFields]="['id','codigo','nombre', 'descripcion','fono']" [rowHover]="true" dataKey="id"
+        [globalFilterFields]="['codigo','concepto', 'porcentaje','voluntario']" [rowHover]="true" dataKey="id"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries">
 
         <!-- TABLE BUTTONS -->
@@ -16,11 +16,12 @@
             <div class="grid">
                 <div class="col-12 sm:col-8 flex">
                     <!-- NUEVO -->
-                    <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
-                        icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+                    <p-button *ngIf="hasPermission('05.04.08.01')" pRipple [outlined]="true" [raised]="true"
+                        severity="primary" label="Nuevo" icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
                     <!-- REPORTE -->
-                    <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info" label="Reporte"
-                        icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                    <p-button *ngIf="hasPermission('05.04.08.07')" pRipple [outlined]="true" [raised]="true"
+                        [text]="true" severity="info" label="Reporte XLS" icon="pi pi-print" class="ml-2"
+                        (click)="exportXLS()" />
                 </div>
                 <div class="col-12 sm:col-4 text-right">
                     <!-- BUSCAR -->
@@ -36,14 +37,14 @@
         <!-- TABLE HEADER -->
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="nombre" style="width:45%">
-                    DEDUCCIÓN <p-sortIcon field="nombre" />
+                <th pSortableColumn="concepto" style="width:45%">
+                    DEDUCCIÓN <p-sortIcon field="concepto" />
                 </th>
-                <th pSortableColumn="descripcion" style="width:15%">
-                    [ % ]<p-sortIcon field="descripcion" />
+                <th pSortableColumn="porcentaje" style="width:15%">
+                    [ % ]<p-sortIcon field="porcentaje" />
                 </th>
-                <th pSortableColumn="descripcion" style="width:15%">
-                    VOL.<p-sortIcon field="descripcion" />
+                <th pSortableColumn="voluntario" style="width:15%">
+                    VOL.<p-sortIcon field="voluntario" />
                 </th>
                 <th style="width:25%;">
                     OPCIONES
@@ -61,12 +62,12 @@
                 <td>{{ deduccion.porcentaje }}&nbsp;%</td>
                 <td>{{ deduccion.voluntario? 'SI':'NO'}}</td>
                 <td>
-                    <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
-                        (click)="showReport(deduccion.id)" />
-                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        severity="success" (click)="showEdit(deduccion)" />
-                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                        (click)="showDelete(deduccion.id)" />
+                    <p-button *ngIf="hasPermission('05.04.08.02')" pRipple icon="pi pi-eye" class="mr-2"
+                        [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(deduccion)" />
+                    <p-button *ngIf="hasPermission('05.04.08.03')" pRipple icon="pi pi-pencil" class="mr-2"
+                        [rounded]="true" [outlined]="true" severity="success" (click)="showEdit(deduccion)" />
+                    <p-button *ngIf="hasPermission('05.04.08.04')" pRipple icon="pi pi-trash" severity="danger"
+                        [rounded]="true" [outlined]="true" (click)="showDelete(deduccion.id)" />
                 </td>
             </tr>
         </ng-template>

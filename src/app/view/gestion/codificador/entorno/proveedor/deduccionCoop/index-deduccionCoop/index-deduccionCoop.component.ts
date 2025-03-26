@@ -1,5 +1,5 @@
 /* ==================================
-    CONTROLLER INDEX SOCIO
+    CONTROLLER INDEX DEDUCCIÓN-COOP
 ================================== */
 import { Component, Input, ViewChild } from '@angular/core';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -13,7 +13,9 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Socio } from '../../../../../../utility/models/gestion/codificador/entorno/Socio';
 import { DialogDeduccionCoopComponent } from '../dialog-deduccionCoop/dialog-deduccionCoop.component';
-import { DeduccionCoopService } from '../../../../../../../service/gestion/codificador/entorno/legal/DeduccionCoop.service';
+import { DeduccionCoopService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/DeduccionCoop.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 
@@ -30,6 +32,7 @@ export class IndexDeduccionCoopComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
 
   // BODY
   @Input() idCooperativa!: any;
@@ -44,9 +47,14 @@ export class IndexDeduccionCoopComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private deduccionCoopService: DeduccionCoopService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
+  }
+  ngOnInit() {
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
   }
 
   // SHOW -> VIEW INDEX
@@ -56,12 +64,16 @@ export class IndexDeduccionCoopComponent {
     console.log('REQUEST->index');
     this.deduccionCoopService.index(this.idCooperativa).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.04');
+        // BODY
         this.deduccionesCoop = response.deduccionesCoop;
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -72,6 +84,11 @@ export class IndexDeduccionCoopComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate(this.idCooperativa);
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(deduccionCoop: any) {
+    this.dialog.showShow(deduccionCoop);
   }
 
   // SHOW -> VIEW EDIT
@@ -100,20 +117,21 @@ export class IndexDeduccionCoopComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
-  }
-
   // EXPORT -> DATA A XLS
   exportXLS() {
     alert('exportXLS');
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }
 

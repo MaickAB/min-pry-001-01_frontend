@@ -1,20 +1,20 @@
 import {
   TimesIcon
-} from "./chunk-54FC4VVO.js";
+} from "./chunk-QX4A4HGX.js";
 import {
   Ripple,
   RippleModule
-} from "./chunk-ZHUW5ERM.js";
-import "./chunk-NPKKW4KD.js";
+} from "./chunk-W4264F35.js";
+import "./chunk-BZUVFHBY.js";
 import {
   DomHandler
-} from "./chunk-EF52XJCL.js";
+} from "./chunk-TKJMWDM5.js";
 import {
   PrimeNGConfig,
   PrimeTemplate,
   SharedModule,
   zindexutils
-} from "./chunk-X6RFHAQI.js";
+} from "./chunk-EC4CQUSK.js";
 import {
   animate,
   animation,
@@ -22,7 +22,7 @@ import {
   transition,
   trigger,
   useAnimation
-} from "./chunk-IXJNHHXQ.js";
+} from "./chunk-2NTS3CPJ.js";
 import {
   CommonModule,
   DOCUMENT,
@@ -30,7 +30,7 @@ import {
   NgIf,
   NgStyle,
   NgTemplateOutlet
-} from "./chunk-JTPC2OEN.js";
+} from "./chunk-L2BRDOON.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -78,10 +78,10 @@ import {
   ɵɵrestoreView,
   ɵɵtemplate,
   ɵɵtemplateRefExtractor
-} from "./chunk-WB6Q5NKU.js";
-import "./chunk-4FSPM5VJ.js";
-import "./chunk-HZ5OHDZM.js";
-import "./chunk-PRRZY7W3.js";
+} from "./chunk-IE27KVD2.js";
+import "./chunk-KT3RQDJZ.js";
+import "./chunk-LMFWYZLC.js";
+import "./chunk-RVQ3RH6Y.js";
 
 // node_modules/primeng/fesm2022/primeng-sidebar.mjs
 var _c0 = ["*"];

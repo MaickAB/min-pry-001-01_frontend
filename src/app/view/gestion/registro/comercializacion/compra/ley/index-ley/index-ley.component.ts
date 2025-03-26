@@ -1,7 +1,6 @@
 /* =============================================
     CONTROLLER INDEX LEYES
 ============================================= */
-
 import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -16,9 +15,10 @@ import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TableModule } from 'primeng/table';
 import { DialogLeyComponent } from '../dialog-ley/dialog-ley.component';
-import { Lote } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/Lote';
 import { LeyService } from '../../../../../../../service/gestion/registro/comercializacion/compra/Ley.service';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 
@@ -34,24 +34,33 @@ export class IndexLeyComponent {
 
   /* ATTRIBUTES
  -------------------------*/
-  @Input() lote!: Lote;
-  @Input() leyes!: any[];
-  @Output() changeLeyes = new EventEmitter<any[]>();
+  // HEADER
+  permissions!: any[];
 
+  // BODY
+  @Input() lote!: any;
+  @Input() leyes!: any[];
   ley!: any;
+
+  // STATE
   estado!: boolean;
   loading!: boolean;
 
   @ViewChild(DialogLeyComponent) dialog!: DialogLeyComponent;
-  @Output() changeDescuento = new EventEmitter();
+  @Output() changeLeyes = new EventEmitter<any>();
 
   /* METHODS
   -------------------------*/
-  // INYECCTIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
     private leyService: LeyService,
     private confirmationService: ConfirmationService) {
+  }
+
+  ngOnInit() {
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
   }
 
   // SHOW -> VIEW INDEX
@@ -61,13 +70,17 @@ export class IndexLeyComponent {
     console.log('REQUEST->index');
     this.leyService.index(this.lote.id).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
+        // BODY
         this.leyes = response.leyes;
-        this.changeLeyes.emit(response.leyes);
+        this.changeLeyes.emit(this.leyes);
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -75,22 +88,22 @@ export class IndexLeyComponent {
     });
   }
 
-  // MUESTRA -> VIEW DETAIL
-  showDetail(id: any) {
-    alert('DETALLE LEY ' + id);
-  }
-
-  // MUESTRA -> VIEW CREATE
+  // SHOW -> VIEW CREATE
   showCreate() {
-    this.dialog.create(this.lote);
+    this.dialog.showCreate(this.lote);
   }
 
-  // MUESTRA -> VIEW EDIT
+  // SHOW -> VIEW SHOW
+  showShow(ley: any) {
+    this.dialog.showShow(ley);
+  }
+
+  // SHOW -> VIEW EDIT
   showEdit(ley: any) {
-    this.dialog.edit(ley);
+    this.dialog.showEdit(ley);
   }
 
-  // MUESTRA -> VIEW DELETE
+  // SHOW -> VIEW DELETE
   showDelete(id: any) {
 
     // MODAL CONFIRMACIÓN
@@ -105,20 +118,21 @@ export class IndexLeyComponent {
         this.leyService.destroy(id).subscribe({
           next: (response) => {
             this.leyes = this.leyes.filter((val) => val.id !== id);
-            this.changeLeyes.emit(response.leyes);
             this.messageService.add({ severity: 'success', summary: 'CONFIRMACIÓN', detail: response.msg, life: 3000 });
             console.log('RESPONSE->destroy', response);
           },
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // MUESTRA -> REPORT GENERAL
-  report() {
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

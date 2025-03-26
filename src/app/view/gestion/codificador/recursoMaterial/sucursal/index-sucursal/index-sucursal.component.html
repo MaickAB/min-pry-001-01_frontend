@@ -33,8 +33,8 @@
         <!-- BODY DETAIL -->
         <!-- TABLE -->
         <p-table #dt [value]="sucursales" [rows]="10" [rowsPerPageOptions]="[10,25,50]" [paginator]="true"
-            [globalFilterFields]="['nombre', 'direccion','fono']" [tableStyle]="{ 'min-width': '75rem' }"
-            [rowHover]="true" dataKey="id"
+            [globalFilterFields]="['nombre','direccion','fono','numLoteInicio','numLoteFin','regional.nombre']"
+            [tableStyle]="{ 'min-width': '75rem' }" [rowHover]="true" dataKey="id"
             currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
             [showCurrentPageReport]="true">
 
@@ -43,11 +43,13 @@
                 <div class="grid">
                     <div class="col-12 sm:col-8">
                         <!-- NUEVO -->
-                        <p-button pRipple [outlined]="true" [raised]="true" severity="primary" label="Nuevo"
-                            icon="pi pi-plus" class="ml-2" (click)="create()" />
+                        <p-button *ngIf="hasPermission('02.02.01')" pRipple [outlined]="true" [raised]="true"
+                            severity="primary" label="Nuevo" icon="pi pi-plus" class="ml-2" (click)="showCreate()" />
+
                         <!-- REPORTE -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
-                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="exportXLS()" />
+                        <p-button *ngIf="hasPermission('02.02.07')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="info" label="Reporte XLS" icon="pi pi-print" class="ml-2"
+                            (click)="exportXLS()" />
                     </div>
                     <div class="col-12 sm:col-4 text-right">
                         <!-- BUSCAR -->
@@ -71,10 +73,10 @@
                         SUCURSAL <p-sortIcon field="nombre" />
                     </th>
                     <th pSortableColumn="numLoteInicio" style="width:20%">
-                        Nº Lote<p-sortIcon field="numLote" />
+                        Nº Lote<p-sortIcon field="numLoteInicio" />
                     </th>
-                    <th pSortableColumn="regional" style="width:20%">
-                        REGIONAL<p-sortIcon field="regional" />
+                    <th pSortableColumn="regional.nombre" style="width:20%">
+                        REGIONAL<p-sortIcon field="regional.nombre" />
                     </th>
                     <th style="width:20%;">
                         OPCIONES
@@ -84,7 +86,7 @@
 
             <!-- TABLE BODY -->
             <ng-template pTemplate="body" let-sucursal>
-                <tr [ngStyle]="{ 'background-color': sucursal.estado === 1 ? '#fff' : '#fdf4f4' }">
+                <tr>
                     <td class="text-center">
                         <img [src]="sucursal.foto"
                             style="width: 70px; height:70px; border-radius:50px; border:3px solid #dcdcdc" />
@@ -100,12 +102,12 @@
                     </td>
                     <td>{{ sucursal.regional.nombre }}</td>
                     <td>
-                        <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="info" (click)="showReport(sucursal.id)" />
-                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="success" (click)="showEdit(sucursal.id)" />
-                        <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
-                            (click)="showDelete(sucursal.id)" />
+                        <p-button *ngIf="hasPermission('02.02.02')" pRipple icon="pi pi-eye" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(sucursal.id)" />
+                        <p-button *ngIf="hasPermission('02.02.03')" pRipple icon="pi pi-pencil" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="success" (click)="showEdit(sucursal.id)" />
+                        <p-button *ngIf="hasPermission('02.02.04')" pRipple icon="pi pi-trash" severity="danger"
+                            [rounded]="true" [outlined]="true" (click)="showDelete(sucursal.id)" />
                     </td>
                 </tr>
             </ng-template>

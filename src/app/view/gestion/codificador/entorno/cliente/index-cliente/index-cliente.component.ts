@@ -17,6 +17,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-cliente',
@@ -31,6 +32,7 @@ export class IndexClienteComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -48,6 +50,8 @@ export class IndexClienteComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private clienteService: ClienteService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -65,6 +69,7 @@ export class IndexClienteComponent {
     this.clienteService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.05');
         this.regionales = response.regionales;
         // BODY        
         this.clientes = response.clientes;
@@ -74,6 +79,7 @@ export class IndexClienteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -84,6 +90,11 @@ export class IndexClienteComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -112,15 +123,11 @@ export class IndexClienteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -131,12 +138,17 @@ export class IndexClienteComponent {
   // ---------------------------------------------
 
   // FILTER -> RECORDS BY ID-REGIONAL
-  filter(idRegional: number) {
-    this.clientes = this.data.filter((val) => val.idRegional == idRegional);
+  filter(idParent: number) {
+    this.clientes = this.data.filter((val) => val.idRegional == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.clientes = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

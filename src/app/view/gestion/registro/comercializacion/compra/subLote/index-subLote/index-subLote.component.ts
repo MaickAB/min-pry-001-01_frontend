@@ -1,7 +1,6 @@
 /* =============================================
     CONTROLLER INDEX SUB-LOTES
 ============================================= */
-
 import { Component, ViewChild, Output, EventEmitter, Input, SimpleChanges } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -15,12 +14,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { TableModule } from 'primeng/table';
-
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
 import { DialogSubLoteComponent } from '../dialog-subLote/dialog-subLote.component';
-import { Lote } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/Lote';
 import { SubLoteService } from '../../../../../../../service/gestion/registro/comercializacion/compra/SubLote.service';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 
@@ -36,23 +34,26 @@ export class IndexSubLoteComponent {
 
   /* ATTRIBUTES
  -------------------------*/
-  @Input() lote!: Lote;
-  @Input() subLotes!: any[];
-  @Input() costo!: any;
-  @Input() descuentos!: any[];
-  @Input() deducciones!: any[];
+  // HEADER
+  permissions!: any[];
 
+  // BODY
+  @Input() lote!: any;
+  @Input() subLotes!: any[];
   auxSubLotes!: any[];
+
+  // STATE
   estado!: boolean;
   loading!: boolean;
 
   @ViewChild(DialogSubLoteComponent) dialog!: DialogSubLoteComponent;
-  @Output() changeSubLote = new EventEmitter();
+  @Output() changeSubLotes = new EventEmitter<any>();
 
   /* METHODS
   -------------------------*/
-  // INYECCTIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
     private subLoteService: SubLoteService,
     private confirmationService: ConfirmationService) {
@@ -60,23 +61,28 @@ export class IndexSubLoteComponent {
 
   ngOnInit() {
     this.loadAuxSubLotes();
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
   }
 
-  // MUESTRA -> VIEW INDEX
+  // SHOW -> VIEW INDEX
   show() {
     this.estado = true;
     this.loading = true;
     console.log('REQUEST->index', this.lote.id);
     this.subLoteService.index(this.lote.id).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
+        // BODY  
         this.subLotes = response.subLotes;
+        this.changeSubLotes.emit(this.subLotes);
         this.loadAuxSubLotes();
-        this.changeSubLote.emit(response.subLotes);
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -84,22 +90,22 @@ export class IndexSubLoteComponent {
     });
   }
 
-  // MUESTRA -> VIEW CREATE
+  // SHOW -> VIEW CREATE
   showCreate() {
-    this.dialog.create(this.lote, this.costo);
+    this.dialog.showCreate(this.lote);
   }
 
-  // MUESTRA -> VIEW DETAIL
-  showDetail(id: any) {
-    alert('DETALLE DESCUENTO ' + id);
+  // SHOW -> VIEW SHOW
+  showShow(subLote: any) {
+    this.dialog.showShow(this.lote, subLote);
   }
 
-  // MUESTRA -> VIEW EDIT
+  // SHOW -> VIEW EDIT
   showEdit(subLote: any) {
-    this.dialog.edit(this.lote, subLote, this.costo);
+    this.dialog.showEdit(this.lote, subLote);
   }
 
-  // MUESTRA -> VIEW DELETE
+  // SHOW -> VIEW DELETE
   showDelete(id: any) {
 
     // MODAL CONFIRMACIÓN
@@ -120,12 +126,14 @@ export class IndexSubLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
+  // LOAD -> DATA AUX
   loadAuxSubLotes() {
     let auxTable: any[] = [];
     const roundToTwo = (num: number): number => parseFloat(num.toFixed(2));
@@ -140,44 +148,20 @@ export class IndexSubLoteComponent {
           pesoBruto: roundToTwo(parseFloat(sl.lote.pesoBruto) * (sl.porcentaje / 100)),
           tara: roundToTwo(sl.lote.tara * (sl.porcentaje / 100)),
           humedad: roundToTwo(sl.lote.humedad * (sl.porcentaje / 100)),
-          pesoNeto: roundToTwo((parseFloat(sl.lote.pesoBruto) - sl.lote.tara - sl.lote.humedad) * (sl.porcentaje / 100)),
-          mineralSus: roundToTwo(this.costo.mineralSus * (sl.porcentaje / 100)),
-          regaliaSus: roundToTwo(this.costo.regaliaSus * (sl.porcentaje / 100)),
-          mineralBs: roundToTwo(this.costo.mineralBs * (sl.porcentaje / 100)),
-          regaliaBs: roundToTwo(this.costo.regaliaBs * (sl.porcentaje / 100)),
-          netoSus: roundToTwo(this.costo.netoSus * (sl.porcentaje / 100)),
-          netoBs: roundToTwo(this.costo.netoBs * (sl.porcentaje / 100)),
-          totalDescuentos: 0,
-          totalLiquidacion: 0
+          pesoNeto: roundToTwo((parseFloat(sl.lote.pesoBruto) - sl.lote.tara - sl.lote.humedad) * (sl.porcentaje / 100))
         });
     })
     this.auxSubLotes = auxTable;
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['costo'] && !changes['costo'].firstChange) {
-      this.loadAuxSubLotes();
-    }
+  // EXPORT -> DATA A XLS
+  exportXLS() {
+    alert('exportXLS');
   }
 
-
-
-
-
-  // getTotalDeduccionGral(field: string): number {
-  //   return this.deducciones.reduce((total, item) => total + (item[field] || 0), 0).toFixed(2);
-  // }
-  // getTotalDeduccion(field: string): number {
-  //   return this.deducciones.reduce((total, item) => total + (item[field] || 0), 0).toFixed(2);
-  // }
-
-  // MUESTRA -> REPORT GENERAL
-  report() {
-    alert('REPORTE COMPLETO');
-  }
-
-  total(col: string): number {
-    return this.subLotes.reduce((total, item) => total + (item[col] || 0), 0).toFixed(2);
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

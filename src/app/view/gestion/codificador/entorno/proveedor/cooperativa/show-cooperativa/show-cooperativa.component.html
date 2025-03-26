@@ -12,7 +12,7 @@
 
                 <!-- BODY-HEADER -->
                 <div class="col-12 sm:col-4">
-                    <div class="card shadow-3" style="min-height:600px;">
+                    <div class="card shadow-3" style="min-height:650px;">
 
                         <!-- IMG -->
                         <div class="text-center py-5">
@@ -41,16 +41,23 @@
                             <textarea pInputTextarea id="descripcion" [(ngModel)]="cooperativa.descripcion" rows="3"
                                 cols="20" class="w-full" [disabled]="true"></textarea>
                         </div>
+
+                        <!-- REGIONAL -->
+                        <div class="field">
+                            <label for="regional">Regional : </label>
+                            <input *ngIf="cooperativa.regional" type="text" pInputText id="regional"
+                                [(ngModel)]="cooperativa.regional.nombre" class="w-full" [disabled]="true" />
+                        </div>
                     </div>
                 </div>
 
                 <!-- BODY-DETAIL -->
                 <div class="col-12 sm:col-8">
-                    <div class="card shadow-3" style="min-height: 600px;">
+                    <div class="card shadow-3" style="min-height: 650px;">
                         <p-tabView [(activeIndex)]="activeIndex">
 
                             <!-- DEDUCCIONES COOPERATIVA -->
-                            <p-tabPanel header="DEDUCCIONES">
+                            <p-tabPanel *ngIf="hasPermission('05.04.08')" header="DEDUCCIONES">
                                 <app-index-deduccionCoop [idCooperativa]="cooperativa.id"
                                     [deduccionesCoop]="deduccionesCoop"></app-index-deduccionCoop>
                                 <hr>
@@ -64,7 +71,7 @@
                             </p-tabPanel>
 
                             <!-- SOCIOS -->
-                            <p-tabPanel header="SOCIOS">
+                            <p-tabPanel *ngIf="hasPermission('05.04.09')" header="SOCIOS">
                                 <app-index-socio [idCooperativa]="cooperativa.id" [socios]="socios"></app-index-socio>
                                 <hr>
 
@@ -93,6 +100,10 @@
     <!-- SECTOR FOOTER -->
     <ng-template pTemplate="footer">
         <div class="custom-footer">
+            <span *ngIf="!loading">
+                <p-button *ngIf="hasPermission('05.04.06')" pRipple label="Imprimir Reporte" icon="pi pi-print"
+                    [text]="true" [raised]="true" severity="info" (click)="report()" />
+            </span>
             <p-button pRipple label="Cerrar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                 (click)="cancel()" />
         </div>

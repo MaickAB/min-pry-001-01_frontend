@@ -22,6 +22,7 @@ import { TipoPersona } from '../../../../../utility/models/utility/TipoPersona';
 import { TipoGenero } from '../../../../../utility/models/utility/TipoGenero';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-persona',
@@ -35,6 +36,7 @@ export class DialogPersonaComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -52,11 +54,13 @@ export class DialogPersonaComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changePersona = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private personaService: PersonaService) {
@@ -67,10 +71,12 @@ export class DialogPersonaComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.personaService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.01');
         this.regionales = response.regionales;
         // BODY        
         this.tipoPersonas = response.tipoPersonas;
@@ -86,6 +92,7 @@ export class DialogPersonaComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -93,15 +100,23 @@ export class DialogPersonaComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.personaService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.01');
         this.regionales = response.regionales;
         // BODY
         this.tipoPersonas = response.tipoPersonas;
@@ -117,6 +132,7 @@ export class DialogPersonaComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -141,7 +157,7 @@ export class DialogPersonaComponent {
           },
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
-            console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -158,15 +174,23 @@ export class DialogPersonaComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
-
+      // SE NOTIFICA A VIEW-PRINCIPAL PARA QUE RECARGE EL STORAGE
+      this.principalService.reload();
     } else {
       this.messageService.add({ severity: 'error', summary: 'ERROR', detail: 'Datos incorrectos...!!' });
       console.log('Datos Incorrectos...!!');
     }
   }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
+  }
+
 
   // CLOSE -> VIEW
   cancel() {
@@ -210,6 +234,11 @@ export class DialogPersonaComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

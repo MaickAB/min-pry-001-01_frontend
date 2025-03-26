@@ -1,3 +1,5 @@
+import { Regional } from "../recursoMaterial/Regional"
+
 export interface Laboratorio {
   id?: number,
   idRegional?: number,
@@ -5,5 +7,6 @@ export interface Laboratorio {
   nombre: string,
   descripcion: string,
   fono: string,
+  regional?: Regional,
   estado?: boolean
 }

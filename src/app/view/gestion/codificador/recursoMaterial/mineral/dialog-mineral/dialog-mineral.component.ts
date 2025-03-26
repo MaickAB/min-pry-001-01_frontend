@@ -17,6 +17,7 @@ import { TipoMineral } from '../../../../../utility/models/utility/TipoMineral';
 import { DropdownModule } from 'primeng/dropdown';
 import { ModalMineralComplejoComponent } from '../modal-mineral-complejo/modal-mineral-complejo.component';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-mineral',
@@ -30,6 +31,7 @@ export class DialogMineralComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   tipoMinerales!: TipoMineral[]
 
   // BODY
@@ -47,12 +49,14 @@ export class DialogMineralComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeMineral = new EventEmitter();
   @ViewChild(ModalMineralComplejoComponent) modal!: ModalMineralComplejoComponent;
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private mineralService: MineralService) {
@@ -63,10 +67,12 @@ export class DialogMineralComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.mineralService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('02.03');
         this.tipoMinerales = response.tipoMinerales;
         // BODY        
         this.minerales = response.minerales;
@@ -82,6 +88,7 @@ export class DialogMineralComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -89,20 +96,28 @@ export class DialogMineralComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.mineralService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('02.03');
         this.tipoMinerales = response.tipoMinerales;
         // BODY
         this.mineral = response.mineral;
         this.minerales = response.minerales;
-        this.updateMineralesComponent();
+        this.updateData();
         this.imgUrl = response.mineral.foto;
         this.imgValida = true;
 
@@ -114,11 +129,18 @@ export class DialogMineralComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
       }
     });
+  }
+
+  // SHOW -> MODAL MINERALES COMPONENTES
+  showModal() {
+    if (this.mineral.idTipoMineral == 2)
+      this.modal.showMinerales(this.minerales, this.mineralesComponent);
   }
 
   // STORE / UPDATE -> DATA
@@ -140,6 +162,7 @@ export class DialogMineralComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -156,6 +179,7 @@ export class DialogMineralComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -165,10 +189,9 @@ export class DialogMineralComponent {
     }
   }
 
-  // SHOW -> MODAL MINERALES COMPONENTES
-  showModal() {
-    if (this.mineral.idTipoMineral == 2)
-      this.modal.showMinerales(this.minerales, this.mineralesComponent);
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -184,7 +207,7 @@ export class DialogMineralComponent {
   }
 
   // UPDATE -> MINERALES COMPONENTES
-  private updateMineralesComponent() {
+  private updateData() {
     this.mineralesComponent = [];
     this.minerales.forEach(mineral => {
       this.mineral.minerales?.forEach(m => {
@@ -195,7 +218,7 @@ export class DialogMineralComponent {
     })
   }
 
-  // GEMERA -> DATOS DE MINERAL EN BASE A MODAL-MINERALES-COMPONENTES
+  // GEMERATE -> DATOS DE MINERAL EN BASE A MODAL-MINERALES-COMPONENTES
   generarDatos(minerales: any) {
     this.mineral.codigo = '';
     this.mineral.abreviatura = '';
@@ -248,13 +271,19 @@ export class DialogMineralComponent {
     }, 1000);
   }
 
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
+
   /* VALIDADORES
   ---------------------------------------*/
+  valIdTipoMineral(): boolean { return this.mineral.idTipoMineral ? true : false }
   valCodigo() { const codigo = /^[\w .-]{1,20}$/; return (codigo.test(this.mineral.codigo) ? true : false); }
   valAbreviatura() { const abreviatura = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{1,20}$/; return (abreviatura.test(this.mineral.abreviatura) ? true : false); }
   valNombre() { const nombre = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{1,50}$/; return (nombre.test(this.mineral.nombre) ? true : false); }
   valDescripcion() { const descripcion = /^[\w áéíóúüñÁÉÍÓÚÜÑ:.-]{0,200}$/; return (descripcion.test(this.mineral.descripcion) ? true : false); }
-  validate() { return (this.valCodigo() && this.valAbreviatura() && this.valNombre() && this.valDescripcion() && this.imgValida); }
+  validate() { return (this.valIdTipoMineral() && this.valCodigo() && this.valAbreviatura() && this.valNombre() && this.valDescripcion() && this.imgValida); }
 }
 
 

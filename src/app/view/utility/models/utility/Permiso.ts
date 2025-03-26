@@ -1,5 +1,5 @@
 export interface Permiso {
-    id?: number,
+    id?: string,
     codigo: string,
     nombre: string,
     icono: string,
@@ -10,7 +10,7 @@ export interface Permiso {
 }
 
 export interface Opcion {
-    id?: number,
+    id?: string,
     codigo: string,
     nombre: string,
     icono: string,

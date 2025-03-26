@@ -59,4 +59,9 @@ export class LoteService {
   public updateState(data: any): Observable<any> {
     return this.httpClient.put<any>(this.url + 'updateState', data);
   }
+
+  // REPORT
+  public report(id: number): Observable<any> {
+    return this.httpClient.get<any>(this.url + 'report/' + id);
+  }
 }

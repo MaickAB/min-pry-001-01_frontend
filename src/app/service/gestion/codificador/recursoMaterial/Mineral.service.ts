@@ -20,11 +20,6 @@ export class MineralService {
     return this.httpClient.get<any>(this.url + 'index');
   }
 
-  // OBTIENE -> LISTADO DE MINERALES POR CRITERIO
-  public search(criterio: any): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'search/' + criterio);
-  }
-
   // OBTIENE -> DATA PARA EL CREATE
   public create(): Observable<any> {
     return this.httpClient.get<any>(this.url + 'create');

@@ -31,6 +31,7 @@ export class DialogRecepcionComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
 
   // BODDY
   recepcion!: any;
@@ -45,25 +46,35 @@ export class DialogRecepcionComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
+
   @Output() changeRecepcion = new EventEmitter();
 
   /* METHODS
   -------------------------*/
-  // INYECCTIÓN -> DEPENDENCIAS
   constructor(
     private principalService: PrincipalService,
     private messageService: MessageService,
     private recepcionService: RecepcionService) {
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
-  edit(id: number) {
+  showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.recepcionService.edit(id).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('07.02');
         // DATA BODY                        
         this.recepcion = response.recepcion;
         this.recepcionLotes = response.recepcion.lotes;
@@ -109,11 +120,16 @@ export class DialogRecepcionComponent {
     }
   }
 
-  // PREPARA -> DATA PARA ENVIAR A BACKEND.
+  // PREPARE -> DATA PARA ENVIAR A BACKEND.
   private prepareData() {
     this.recepcion.idUsuarioDestino = this.usuario.id;
     this.recepcion.fechaHoraDestino = this.fechaHora;
     this.recepcion.lotes = this.selected.map(d => ({ idLote: d.idLote, estadoTransferencia: 'ENVIADO', estadoRecepcion: 'RECIBIDO' }));
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> MODAL
@@ -126,6 +142,11 @@ export class DialogRecepcionComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

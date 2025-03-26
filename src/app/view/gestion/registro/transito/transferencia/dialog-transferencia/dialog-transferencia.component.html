@@ -25,8 +25,9 @@
                                         <label>Regional:</label>
                                     </div>
                                     <div class="col-8">
-                                        <p-dropdown id="idRegional" [options]="regionalesOrigen" optionValue="id"
-                                            optionLabel="nombre" [(ngModel)]="transferencia.idRegionalOrigen"
+                                        <p-dropdown [disabled]="disabled" id="idRegional" [options]="regionalesOrigen"
+                                            optionValue="id" optionLabel="nombre"
+                                            [(ngModel)]="transferencia.idRegionalOrigen"
                                             (onChange)="loadSucursalesOrigen($event.value)"
                                             (onChange)="clearDetail()" />
                                         <small class="p-error" *ngIf="!valIdRegionalOrigen()">Requerido.</small>
@@ -39,8 +40,9 @@
                                         <label>Sucursal:</label>
                                     </div>
                                     <div class="col-8">
-                                        <p-dropdown id="idSucursal" [options]="sucursalesOrigen" optionValue="id"
-                                            optionLabel="nombre" [(ngModel)]="transferencia.idSucursalOrigen"
+                                        <p-dropdown [disabled]="disabled" id="idSucursal" [options]="sucursalesOrigen"
+                                            optionValue="id" optionLabel="nombre"
+                                            [(ngModel)]="transferencia.idSucursalOrigen"
                                             (onChange)="filterBySucursal($event.value)" />
                                         <small class="p-error" *ngIf="!valIdSucursalOrigen()">Requerido.</small>
                                     </div>
@@ -59,8 +61,9 @@
                                         <label>Regional:</label>
                                     </div>
                                     <div class="col-8">
-                                        <p-dropdown id="idRegional" [options]="regionalesDestino" optionValue="id"
-                                            optionLabel="nombre" [(ngModel)]="transferencia.idRegionalDestino"
+                                        <p-dropdown [disabled]="disabled" id="idRegional" [options]="regionalesDestino"
+                                            optionValue="id" optionLabel="nombre"
+                                            [(ngModel)]="transferencia.idRegionalDestino"
                                             (onChange)="loadSucursalesDestino($event.value)" />
                                         <small class="p-error" *ngIf="!valIdRegionalDestino()">Requerido.</small>
                                     </div>
@@ -72,8 +75,9 @@
                                         <label>Sucursal:</label>
                                     </div>
                                     <div class="col-8">
-                                        <p-dropdown id="idSucursal" [options]="sucursalesDestino" optionValue="id"
-                                            optionLabel="nombre" [(ngModel)]="transferencia.idSucursalDestino" />
+                                        <p-dropdown [disabled]="disabled" id="idSucursal" [options]="sucursalesDestino"
+                                            optionValue="id" optionLabel="nombre"
+                                            [(ngModel)]="transferencia.idSucursalDestino" />
                                         <small class="p-error" *ngIf="!valIdSucursalDestino()">Requerido.</small>
                                     </div>
                                 </div>
@@ -101,8 +105,8 @@
                         <div class="grid">
                             <div class="col-12 md:col-8">
                                 <!-- NUEVO -->
-                                <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary"
-                                    label="Agregar Lote" icon="pi pi-plus" (click)="showAddLote()"
+                                <p-button *ngIf="!disabled" pRipple [outlined]="true" [raised]="true" [text]="true"
+                                    severity="primary" label="Agregar Lote" icon="pi pi-plus" (click)="showAddLote()"
                                     [style]="{'width':'150px'}" />
                             </div>
                             <div class="col-12 md:col-4 text-right">
@@ -162,8 +166,8 @@
                                 }
                             </td>
                             <td>
-                                <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true"
-                                    [outlined]="true" (click)="deleteLote(lote.id)" />
+                                <p-button *ngIf="!disabled" pRipple icon="pi pi-trash" severity="danger"
+                                    [rounded]="true" [outlined]="true" (click)="deleteLote(lote.id)" />
                             </td>
                         </tr>
                     </ng-template>
@@ -173,8 +177,8 @@
                 <!-- DESCRIPCIÓN -->
                 <div class="field">
                     <h5>Descripción de transferencia:</h5>
-                    <textarea pInputTextarea id="descripcion" [(ngModel)]="transferencia.descripcionOrigen" rows="5"
-                        cols="20" class="w-full"></textarea>
+                    <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                        [(ngModel)]="transferencia.descripcionOrigen" rows="5" cols="20" class="w-full"></textarea>
                     <small class="p-error" *ngIf="!valDescripcion()">Requerido. Alfanumérico de: 1-500</small>
                 </div>
             </div>
@@ -210,8 +214,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('07.01.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('07.01.01') || hasPermission('07.01.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

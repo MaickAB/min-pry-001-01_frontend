@@ -24,15 +24,16 @@
                         <!-- FECHA -->
                         <div class="field">
                             <label for="fecha">Fecha</label>
-                            <input type="date" pInputText id="fecha" [(ngModel)]="cotizacion15.fecha" class="w-full" />
+                            <input [disabled]="disabled" type="date" pInputText id="fecha"
+                                [(ngModel)]="cotizacion15.fecha" class="w-full" />
                             <small class="p-error" *ngIf="!valFecha()">Requerido, tipo Fecha.</small>
                         </div>
 
                         <!-- OBSERVACIONES -->
                         <div class="field">
                             <label for="observacion">Observaciones</label>
-                            <textarea pInputTextarea id="observacion" [(ngModel)]="cotizacion15.observacion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="observacion"
+                                [(ngModel)]="cotizacion15.observacion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valObservacion()">Opcional, Alfanumérico de
                                 0-200.</small>
                         </div>
@@ -53,8 +54,8 @@
                                         <tr>
                                             <th style="width: 25%">MINERAL</th>
                                             <th style="width: 25%">COTIZACIÓN</th>
-                                            <th style="width: 25%">REGALIA</th>
                                             <th style="width: 25%">UNIDAD MEDIDA</th>
+                                            <th style="width: 25%">REGALIA (%)</th>
                                         </tr>
                                     </ng-template>
                                     <ng-template pTemplate="body" let-detalle let-i="rowIndex">
@@ -74,16 +75,19 @@
                                                 } -->
                                             </td>
                                             <td>
-                                                <input type="hidden" pInputText [(ngModel)]="detalle.id" />
-                                                <input type="number" pInputText [(ngModel)]="detalle.valorCotizacion" />
+                                                <input [disabled]="disabled" type="hidden" pInputText
+                                                    [(ngModel)]="detalle.id" />
+                                                <input [disabled]="disabled" type="number" pInputText
+                                                    [(ngModel)]="detalle.valorCotizacion" />
                                             </td>
                                             <td>
-                                                <input type="number" pInputText [(ngModel)]="detalle.valorRegalia" />
-                                            </td>
-                                            <td>
-                                                <p-dropdown id="idUnidadMedida" [options]="unidadMedidas"
-                                                    optionValue="id" optionLabel="abreviatura"
+                                                <p-dropdown [disabled]="disabled" id="idUnidadMedida"
+                                                    [options]="unidadMedidas" optionValue="id" optionLabel="abreviatura"
                                                     [(ngModel)]="detalle.idUnidadMedida" [appendTo]="'body'" />
+                                            </td>
+                                            <td>
+                                                <input [disabled]="disabled" type="number" pInputText
+                                                    [(ngModel)]="detalle.valorRegalia" />
                                             </td>
                                         </tr>
                                     </ng-template>
@@ -125,8 +129,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('05.02.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('05.02.01') || hasPermission('05.02.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

@@ -17,7 +17,7 @@ import { Regional } from '../../../../../utility/models/gestion/codificador/recu
 import { DropdownModule } from 'primeng/dropdown';
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
-import { ComunService } from '../../../../../../service/utility/Comun.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-sucursal',
@@ -31,6 +31,7 @@ export class DialogSucursalComponent {
   /* ATTRIBUTES
  -------------------------*/
   //  HEADER 
+  permissions!: any[];
   regionales!: Regional[];
 
   //  BODY
@@ -46,11 +47,13 @@ export class DialogSucursalComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeSucursal = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private sucursalService: SucursalService) {
@@ -61,10 +64,12 @@ export class DialogSucursalComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.sucursalService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('02.02');
         this.regionales = response.regionales;
         // BODY        
         this.imgUrl = '/img/imgDefecto.png';
@@ -78,6 +83,7 @@ export class DialogSucursalComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -85,15 +91,23 @@ export class DialogSucursalComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.sucursalService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('02.02');
         this.regionales = response.regionales;
         // BODY        
         this.imgUrl = response.sucursal.foto;
@@ -107,6 +121,7 @@ export class DialogSucursalComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -132,6 +147,7 @@ export class DialogSucursalComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -148,6 +164,7 @@ export class DialogSucursalComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -155,6 +172,11 @@ export class DialogSucursalComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR', detail: 'Datos incorrectos...!!' });
       console.log('Datos Incorrectos...!!');
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -201,14 +223,19 @@ export class DialogSucursalComponent {
     }, 1000);
   }
 
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
+
   /* VALIDADORES
   ---------------------------------------*/
   valIdRegional(): boolean { return this.sucursal.idRegional ? true : false }
-  valNombre() { const nombre = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{1,50}$/; return (nombre.test(this.sucursal.nombre) ? true : false); }
+  // valNombre() { const nombre = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{1,50}$/; return (nombre.test(this.sucursal.nombre) ? true : false); }
   valDescripcion() { const descripcion = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{0,200}$/; return (descripcion.test(this.sucursal.descripcion) ? true : false); }
   valDireccion() { const direccion = /^[\w áéíóúüñÁÉÍÓÚÜÑ.-]{1,200}$/; return (direccion.test(this.sucursal.direccion) ? true : false); }
   valFono() { const fono = /^[\d +-]{1,20}$/; return (fono.test(this.sucursal.fono) ? true : false); }
   valNumLoteInicio() { const numLoteInicio = /^[\d]{1,20}$/; return (numLoteInicio.test(this.sucursal.numLoteInicio) ? true : false); }
   valNumLoteFin() { const numLoteFin = /^[\d]{1,20}$/; return (numLoteFin.test(this.sucursal.numLoteFin) ? true : false); }
-  validate() { return (this.valIdRegional() && this.valNombre() && this.valDescripcion() && this.valDireccion() && this.valFono() && this.imgValida && this.valNumLoteInicio() && this.valNumLoteFin()); }
+  validate() { return (this.valIdRegional() && this.valDescripcion() && this.valDireccion() && this.valFono() && this.imgValida && this.valNumLoteInicio() && this.valNumLoteFin()); }
 }

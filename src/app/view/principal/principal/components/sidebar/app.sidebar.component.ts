@@ -2,6 +2,7 @@ import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core'
 
 import { AppMenuComponent } from '../menu/app.menu.component'
 import { LayoutService } from '../../../../../service/principal/app.layout.service'
+import { PrincipalService } from '../../../../../service/principal/Principal.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,9 +15,10 @@ export class AppSidebarComponent {
   constructor(
     public layoutService: LayoutService,
     public el: ElementRef,
+    public principalService: PrincipalService
   ) { }
 
-  showPermisos(permisos: any) {
-    this.menuOpcion.showPermisos(permisos);
+  show(permisos: any) {
+    this.menuOpcion.show(permisos);
   }
 }

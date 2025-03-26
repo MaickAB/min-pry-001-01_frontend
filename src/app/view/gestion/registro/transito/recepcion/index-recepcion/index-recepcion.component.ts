@@ -19,6 +19,7 @@ import { Sucursal } from '../../../../../utility/models/gestion/codificador/recu
 import { DialogRecepcionComponent } from '../dialog-recepcion/dialog-recepcion.component';
 import { RecepcionService } from '../../../../../../service/gestion/registro/transito/Recepcion.service';
 import { Recepcion } from '../../../../../utility/models/gestion/registro/transito/recepcion';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 
 @Component({
   selector: 'app-index-recepcion',
@@ -32,22 +33,27 @@ export class IndexRecepcionComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  // HEADER
+  permissions!: any[];
   regionales!: Regional[];
   sucursales!: Sucursal[];
 
+  // BODY
   recepciones!: Recepcion[];
   dataCompleto!: Recepcion[];
   dataFiltrado!: Recepcion[];
 
+  // STATE
   loading: boolean = false;
+
   @ViewChild(DialogRecepcionComponent) dialog!: DialogRecepcionComponent;
 
   /* METHODS
   -------------------------*/
   constructor(
+    private principalService: PrincipalService,
     private recepcionService: RecepcionService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService) {
+    private messageService: MessageService) {
   }
 
   // LOAD -> DATA INICIAL
@@ -55,17 +61,18 @@ export class IndexRecepcionComponent {
     this.show();
   }
 
-  // OBTIENE -> DATA INICIAL
+  // SHOW -> VIEW INDEX
   show() {
     this.loading = true;
     console.log('REQUEST->index');
     this.recepcionService.index().subscribe({
       next: (response) => {
-        // DATA HEADER
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('07.02');
         this.regionales = response.regionales;
         this.sucursales = []
 
-        // DATA BODY        
+        // BODY        
         this.recepciones = response.recepciones;
         this.dataCompleto = response.recepciones;
         console.log('RESPONSE->index', response);
@@ -80,46 +87,52 @@ export class IndexRecepcionComponent {
     });
   }
 
-  // MUESTRA -> VIEW EDIT
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
+  }
+
+  // SHOW -> VIEW EDIT
   showEdit(id: number) {
-    this.dialog.edit(id);
+    this.dialog.showEdit(id);
   }
 
-  // MUESTRA -> REPORT GENERAL
-  showReportGral() {
-    alert('REPORTE COMPLETO');
-  }
-
-  // MUESTRA -> REPORT INDIVIDUAL
-  showReport(id: any) {
-    alert('REPORTE INDIVIDUAL');
-  }
-
-  // CARGA -> SUCURSALES EN EL COMBO
+  // LOAD -> SUCURSALES
   loadSucursales(idRegional: any) {
     const regionalSelected = this.regionales.find(r => r.id === idRegional);
     this.sucursales = regionalSelected ? regionalSelected.sucursales : [];
   }
 
-  // FILTRA -> LOTES POR REGIONAL
+  // FILTER -> LOTES POR REGIONAL
   filterByRegional(idRegional: number) {
     this.recepciones = this.dataCompleto.filter((val) => val.idRegionalOrigen == idRegional);
     this.dataFiltrado = this.recepciones;
     this.loadSucursales(idRegional);
   }
 
-  // FILTRA -> LOTES POR SUCURSAL
+  // FILTER -> LOTES POR SUCURSAL
   filterBySucursal(idSucursal: number) {
     this.recepciones = this.dataCompleto.filter((val) => val.idSucursalOrigen == idSucursal);
   }
 
-  // ELIMINA -> FILTRO REGIONAL
+  // CLEAR -> FILTRO REGIONAL
   clearFilterRegional() {
     this.recepciones = this.dataCompleto;
   }
 
-  // ELIMINA -> FILTRO SUCURSAL
+  // CLEAR -> FILTRO SUCURSAL
   clearFilterSucursal() {
     this.recepciones = this.dataFiltrado;
   }
+
+  // EXPORT -> DATA A XLS
+  exportXLS() {
+    alert('exportXLS');
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
+
 }

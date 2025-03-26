@@ -24,15 +24,16 @@
                         <!-- CODIGO -->
                         <div class="field">
                             <label for="codigo">Código</label>
-                            <input type="text" pInputText id="codigo" [(ngModel)]="deduccion.codigo" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="codigo"
+                                [(ngModel)]="deduccion.codigo" class="w-full" />
                             <small class="p-error" *ngIf="!valCodigo()">Requerido, Alfanumérico de 1-20.</small>
                         </div>
 
                         <!-- CONCEPTO -->
                         <div class="field">
                             <label for="concepto">Concepto</label>
-                            <textarea pInputTextarea id="concepto" [(ngModel)]="deduccion.concepto" rows="3" cols="20"
-                                class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="concepto"
+                                [(ngModel)]="deduccion.concepto" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valConcepto()">Requerido, Alfanumérico de 1-200.</small>
                         </div>
 
@@ -42,8 +43,8 @@
                                 <label for="porcentaje">Porcentaje (%) :</label>
                             </div>
                             <div class="col-6">
-                                <input type="number" pInputText id="porcentaje" [(ngModel)]="deduccion.porcentaje"
-                                    class="w-full" step=".01" />
+                                <input [disabled]="disabled" type="number" pInputText id="porcentaje"
+                                    [(ngModel)]="deduccion.porcentaje" class="w-full" step=".01" />
                                 <small class="p-error" *ngIf="!valPorcentaje()">Requerido, Numérico.</small>
                             </div>
                         </div>
@@ -81,8 +82,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('05.03.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('05.03.01') || hasPermission('05.03.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

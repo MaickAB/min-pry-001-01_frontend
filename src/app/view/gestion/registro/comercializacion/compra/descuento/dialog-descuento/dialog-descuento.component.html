@@ -1,37 +1,63 @@
 <!-- =================================
         VIEW DIALOG DESCUENTO
 ================================== -->
-<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRAR DESCUENTOS" [modal]="true"
-    [draggable]="false" styleClass="p-fluid dialog-responsive custom-header">
+<p-dialog [(visible)]="estado" closeOnEscape="true" closable="true" header="REGISTRO DE DESCUENTOS" [modal]="true"
+    [draggable]="false" [style]="{'width': '75vw'}" styleClass="p-fluid dialog-responsive custom-header">
 
     <!-- SECTOR BODY -->
     <ng-template pTemplate="content">
         <hr>
-        <div class="card-body shadow-3">
-            <div class="grid">
-                <div class="col-4 text-center">
-                    <i class="pi pi-dollar pt-5" style="font-size: 100px"></i>
-                </div>
-                <div class="col-8">
+        <div *ngIf="!loading && !reportPDF">
 
-                    <!-- MONTO -->
-                    <div class="field">
-                        <label for="monto">Monto</label>
-                        <input type="number" pInputText id="monto" [(ngModel)]="descuento.monto" class="w-full" />
-                        <small class="p-error" *ngIf="!valMonto()">Requerido, Numérico.</small>
+            <!-- BODY DETAIL -->
+            <div class="card shadow-3">
+                <div class="grid">
+                    <div class="col-4 text-center">
+                        <i class="pi pi-dollar pt-5" style="font-size: 100px"></i>
                     </div>
+                    <div class="col-8">
 
-                    <!-- CONCEPTO -->
-                    <div class="field">
-                        <label for="concepto">Concepto</label>
-                        <textarea pInputTextarea id="Concepto" [(ngModel)]="descuento.concepto" rows="3" cols="20"
-                            class="w-full"></textarea>
-                        <small class="p-error" *ngIf="!valConcepto()">Requerido, Alfanumérico de 1-200.</small>
+                        <!-- MONTO -->
+                        <div class="field">
+                            <label for="monto">Monto (Bs)</label>
+                            <input [disabled]="disabled" type="number" pInputText id="monto"
+                                [(ngModel)]="descuento.monto" class="w-full" />
+                            <small class="p-error" *ngIf="!valMonto()">Requerido, Numérico.</small>
+                        </div>
+
+                        <!-- CONCEPTO -->
+                        <div class="field">
+                            <label for="concepto">Concepto</label>
+                            <textarea [disabled]="disabled" pInputTextarea id="Concepto"
+                                [(ngModel)]="descuento.concepto" rows="3" cols="20" class="w-full"></textarea>
+                            <small class="p-error" *ngIf="!valConcepto()">Requerido, Alfanumérico de 1-200.</small>
+                        </div>
                     </div>
                 </div>
             </div>
+            <hr>
+            <!-- BODY FOOTER -->
+            <div>
+                <p>
+                    <b>USUARIO: </b> {{usuario.persona.nombre}} {{usuario.persona.apePaterno}}
+                    {{usuario.persona.apeMaterno}}<br>
+                    <b>FECHA: </b> {{ fechaHora | date:'dd/MM/yyyy' }}
+                    <b>HORA: </b> {{ fechaHora | date:'HH:mm:ss' }}
+                </p>
+            </div>
+        </div>
+        <!-- LOADING -->
+        <div *ngIf="loading">
+            <div class="card  mt-3 flex flex-column justify-content-center align-items-center" style="height: 30vh;">
+                <p-progressSpinner ariaLabel="loading" />
+                <span class="loader ps-5">Cargando...</span>
+            </div>
         </div>
 
+        <!-- REPORT PDF -->
+        <ng-container *ngIf="!loading && reportPDF">
+            <iframe [src]="reportPDF" width="100%" height="600px"></iframe>
+        </ng-container>
     </ng-template>
 
     <!-- SECTOR FOOTER -->
@@ -44,8 +70,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span>
+                    <p-button *ngIf="disabled && hasPermission('06.01.08.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('06.01.08.01') || hasPermission('06.01.08.03'))"
+                        pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

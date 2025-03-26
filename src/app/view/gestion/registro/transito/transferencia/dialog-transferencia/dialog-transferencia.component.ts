@@ -37,6 +37,7 @@ export class DialogTransferenciaComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionalesOrigen!: Regional[];
   sucursalesOrigen!: Sucursal[];
   regionalesDestino!: Regional[];
@@ -56,6 +57,7 @@ export class DialogTransferenciaComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @ViewChild(ModalAddLoteComponent) dialog!: ModalAddLoteComponent;
   @Output() changeTransferencia = new EventEmitter();
 
@@ -65,24 +67,25 @@ export class DialogTransferenciaComponent {
   constructor(
     private principalService: PrincipalService,
     private messageService: MessageService,
-    private transferenciaService: TransferenciaService,
-    private comunService: ComunService) {
+    private transferenciaService: TransferenciaService) {
   }
 
   // SHOW -> VIEW CREATE
-  create() {
+  showCreate() {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->create');
     this.transferenciaService.create().subscribe({
       next: (response) => {
-        // DATA HEADER
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('07.01');
         this.regionalesOrigen = response.regionalesOrigen;
         this.sucursalesDestino = [];
         this.regionalesDestino = response.regionalesDestino;
         this.sucursalesDestino = [];
-        // DATA BODY                        
+        // BODY                        
         this.transferencia = { fechaHoraOrigen: '', descripcionOrigen: '', lotes: [] };
         this.transferenciaLotes = [];
         this.lotes = response.lotes;
@@ -102,21 +105,29 @@ export class DialogTransferenciaComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
-  edit(id: number) {
+  showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     console.log('REQUEST->edit', id);
     this.transferenciaService.edit(id).subscribe({
       next: (response) => {
-        // DATA HEADER
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('07.01');
         this.regionalesOrigen = response.regionalesOrigen;
         this.loadSucursalesOrigen(response.transferencia.idRegionalOrigen);
         this.regionalesDestino = response.regionalesDestino;
         this.loadSucursalesDestino(response.transferencia.idRegionalDestino);
 
-        // DATA BODY                         
+        // BODY                         
         this.transferencia = response.transferencia;
         this.transferenciaLotes = this.loadDetail(response.lotes, response.transferencia.lotes);
         this.lotes = response.lotes;
@@ -211,6 +222,11 @@ export class DialogTransferenciaComponent {
     this.transferenciaLotes = [];
   }
 
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
+  }
+
   // CLOSE -> MODAL
   cancel() {
     this.estado = false;
@@ -247,11 +263,16 @@ export class DialogTransferenciaComponent {
     this.transferenciaLotes = detail;
   }
 
-  // LOAD -> FECHA-HORA
+  // INIT -> FECHA CON RELOJ
   private initReloj() {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

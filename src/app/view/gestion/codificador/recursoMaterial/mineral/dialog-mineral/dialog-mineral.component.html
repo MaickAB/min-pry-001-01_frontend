@@ -19,13 +19,14 @@
                             <label for="idTipoMineral">Tipo de Mineral:</label>
                         </div>
                         <div class="col-6">
-                            <p-dropdown id="idTipoMineral" [options]="tipoMinerales" [(ngModel)]="mineral.idTipoMineral"
-                                optionValue="id" optionLabel="nombre" (onChange)="showModal()" />
-                            <!-- <small class="p-error" *ngIf="!valIdTipoPersona()">Requerido.</small> -->
+                            <p-dropdown [disabled]="disabled" id="idTipoMineral" [options]="tipoMinerales"
+                                [(ngModel)]="mineral.idTipoMineral" optionValue="id" optionLabel="nombre"
+                                (onChange)="showModal()" />
+                            <small class="p-error" *ngIf="!valIdTipoMineral()">Requerido.</small>
                         </div>
                         <div class="col-1">
-                            <p-button pRipple icon="pi pi-eye" [text]="true" [raised]="true" severity="primary"
-                                (click)="showModal()" />
+                            <p-button *ngIf="!disabled" pRipple icon="pi pi-eye" [text]="true" [raised]="true"
+                                severity="primary" (click)="showModal()" />
                         </div>
                     </div>
                 </div>
@@ -43,7 +44,8 @@
                             <!-- IMG-MINERAL -->
                             <div class="field">
                                 <label for="foto">Foto</label>
-                                <input type="file" pInputText id="foto" (change)="loadImg($event)" />
+                                <input [disabled]="disabled" type="file" pInputText id="foto"
+                                    (change)="loadImg($event)" />
                                 <small class="p-error" *ngIf="!imgValida">Requerido, jpg, png max:2MB.</small>
                                 <div *ngIf="imgUrl" class="pt-3">
                                     <img [src]="imgUrl" alt="Vista previa de la imagen"
@@ -60,15 +62,16 @@
                         <!-- CODIGO -->
                         <div class="field">
                             <label for="codigo">Codigo</label>
-                            <input type="text" pInputText id="codigo" [(ngModel)]="mineral.codigo" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="codigo" [(ngModel)]="mineral.codigo"
+                                class="w-full" />
                             <small class="p-error" *ngIf="!valCodigo()">Requerido, Alfanumérico de 1-20.</small>
                         </div>
 
                         <!-- ABREVIATURA -->
                         <div class="field">
                             <label for="abreviatura">Abreviatura</label>
-                            <input type="text" pInputText id="abreviatura" [(ngModel)]="mineral.abreviatura"
-                                class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="abreviatura"
+                                [(ngModel)]="mineral.abreviatura" class="w-full" />
                             <small class="p-error" *ngIf="!valAbreviatura()">Requerido, Alfanumérico de
                                 1-20.</small>
                         </div>
@@ -76,15 +79,16 @@
                         <!-- NOMBRE -->
                         <div class="field">
                             <label for="nombre">Nombre</label>
-                            <input type="text" pInputText id="nombre" [(ngModel)]="mineral.nombre" class="w-full" />
+                            <input [disabled]="disabled" type="text" pInputText id="nombre" [(ngModel)]="mineral.nombre"
+                                class="w-full" />
                             <small class="p-error" *ngIf="!valNombre()">Requerido, Alfanumérico de 1-50.</small>
                         </div>
 
                         <!-- DESCRIPCIÓN -->
                         <div class="field">
                             <label for="descripcion">Description</label>
-                            <textarea pInputTextarea id="descripcion" [(ngModel)]="mineral.descripcion" rows="3"
-                                cols="20" class="w-full"></textarea>
+                            <textarea [disabled]="disabled" pInputTextarea id="descripcion"
+                                [(ngModel)]="mineral.descripcion" rows="3" cols="20" class="w-full"></textarea>
                             <small class="p-error" *ngIf="!valDescripcion()">Opcional, Alfanumérico de
                                 0-200.</small>
                         </div>
@@ -123,8 +127,13 @@
                 </div>
             </div>
             <div class="col-6">
-                <p-button pRipple label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
-                    [hidden]="saving" (click)="save()" />
+                <span *ngIf="!loading">
+                    <p-button *ngIf="disabled && hasPermission('02.03.06')" pRipple label="Imprimir Reporte"
+                        icon="pi pi-print" [text]="true" [raised]="true" severity="info" (click)="report()" />
+                    <p-button *ngIf="!disabled && (hasPermission('02.03.01') || hasPermission('02.03.03'))" pRipple
+                        label="Guardar" icon="pi pi-check" [text]="true" [raised]="true" severity="primary"
+                        [hidden]="saving" (click)="save()" />
+                </span>
                 <p-button pRipple label="Cancelar" icon="pi pi-times" [text]="true" [raised]="true" severity="warning"
                     (click)="cancel()" />
             </div>

@@ -16,6 +16,8 @@ import { Laboratorio } from '../../../../../utility/models/gestion/codificador/e
 import { LaboratorioService } from '../../../../../../service/gestion/codificador/entorno/Laboratorio.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-laboratorio',
@@ -30,6 +32,7 @@ export class IndexLaboratorioComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -43,6 +46,8 @@ export class IndexLaboratorioComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private laboratorioService: LaboratorioService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -60,6 +65,7 @@ export class IndexLaboratorioComponent {
     this.laboratorioService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.06');
         this.regionales = response.regionales;
         // BODY        
         this.laboratorios = response.laboratorios;
@@ -69,6 +75,7 @@ export class IndexLaboratorioComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -79,6 +86,11 @@ export class IndexLaboratorioComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -107,15 +119,11 @@ export class IndexLaboratorioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -126,12 +134,17 @@ export class IndexLaboratorioComponent {
   // ---------------------------------------------
 
   // FILTER -> RECORDS BY ID-REGIONAL
-  filter(idRegional: number) {
-    this.laboratorios = this.data.filter((val) => val.idRegional == idRegional);
+  filter(idParent: number) {
+    this.laboratorios = this.data.filter((val) => val.idRegional == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.laboratorios = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

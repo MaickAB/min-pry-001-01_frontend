@@ -13,12 +13,12 @@ import { ToastModule } from 'primeng/toast';
 import { TableModule } from 'primeng/table';
 import { RolService } from '../../../../../../service/gestion/codificador/recursoHumano/Rol.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Permiso } from '../../../../../utility/models/utility/Permiso';
 import { Rol } from '../../../../../utility/models/gestion/codificador/recursoHumano/Rol';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 import { TabViewModule } from 'primeng/tabview';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-rol',
@@ -33,11 +33,12 @@ export class DialogRolComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY  
-  permisos!: Permiso[];
-  selected!: any[];
+  permisos!: any[];
+  selected!: any[][];
   rol!: Rol;
 
   // FOOTER
@@ -48,12 +49,14 @@ export class DialogRolComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   activeIndex!: number;
   @Output() changeRol = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private rolService: RolService) {
@@ -64,11 +67,13 @@ export class DialogRolComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     this.activeIndex = 0;
     console.log('REQUEST->create');
     this.rolService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.02');
         this.regionales = response.regionales;
         // BODY        
         this.permisos = response.permisos;
@@ -82,6 +87,7 @@ export class DialogRolComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -89,22 +95,29 @@ export class DialogRolComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     this.activeIndex = 0;
     console.log('REQUEST->edit', id);
     this.rolService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.02');
         this.regionales = response.regionales;
         // BODY                
         this.permisos = response.permisos;
         this.rol = response.rol;
-        this.rol.permisos = response.rol.permisos.map((p: any) => ({ id: p.idPermiso }));
-        this.updatePermisos();
+        this.updateData();
         // FOOTER
         this.usuario = this.principalService.getUsuarioStorage();
         this.fechaHora = this.initReloj();
@@ -113,6 +126,7 @@ export class DialogRolComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -139,6 +153,7 @@ export class DialogRolComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -155,13 +170,21 @@ export class DialogRolComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
+      // SE NOTIFICA A VIEW-PRINCIPAL PARA QUE RECARGE EL STORAGE
+      this.principalService.reload();
     } else {
       this.messageService.add({ severity: 'error', summary: 'ERROR REQUEST', detail: 'Datos Incorrectos...!!' });
       console.log('Datos Incorrectos...!!')
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -173,32 +196,52 @@ export class DialogRolComponent {
 
   // PREPARE -> DATA FOR BACKEND.
   prepareData() {
-    this.rol.permisos = [];
-    let grupos = [...new Set(this.selected.map(s => (s.idGrupo)))];
-    for (let i = 0; i < grupos.length; i++) {
-      this.rol.permisos.push({ id: grupos[i] })
-      this.selected.forEach(s => {
-        if (grupos[i] == s.idGrupo) {
-          this.rol.permisos.push({ id: s.id })
-        }
+    let permisos: any = [];
+    let opciones: any = [];
+    let subOpciones: any = [];
+    Object.values(this.selected).forEach(arr => {
+      arr.forEach(opc => {
+        // SE COMPLETA LA SELECCIÓN
+        permisos.push(opc.id.substring(0, 2));
+        opciones.push(opc.id.substring(0, 5));
+        subOpciones.push(opc.id);
       });
-    }
+    });
+    // SE UNE LOS TES ARRAY A UNO SOLO Y SE LO CARGA AL ROL-PERMISOS
+    let arrayPermisos = [...new Set([...permisos, ...opciones, ...subOpciones])];
+    this.rol.permisos = [];
+    arrayPermisos.forEach(per => {
+      this.rol.permisos.push({ 'id': per });
+    })
   }
 
   // UPDATE -> PERMISOS SELECCIONADOS
-  updatePermisos() {
+  updateData() {
     this.selected = [];
-    this.permisos.forEach(permiso => {
-      if (permiso.opciones.length > 0) {
-        permiso.opciones.forEach((opcion: any) => {
-          this.rol.permisos?.forEach(rp => {
-            if (opcion.id == rp.id) {
-              this.selected.push(opcion);
+    let auxSelected = this.rol.permisos.map((p: any) => ({ id: p.idPermiso }));
+    let permisos = auxSelected.filter((p: any) => p.id.length == 2);
+    let opciones = auxSelected.filter((p: any) => p.id.length == 5);
+    let subOpciones = auxSelected.filter((p: any) => p.id.length > 5);
+
+    // SE CARGA SOLO LOS PEMISOS DE NIVEL 01 PERMITIDOS
+    let auxPermisos = this.permisos.filter(per =>
+      permisos.some(p => p.id === per.id)
+    );
+
+    auxPermisos.forEach(permiso => {
+      permiso.opciones.forEach((opcion: any) => {
+        let opc: any = [];
+        opcion.opciones.forEach((subOpcion: any) => {
+          subOpciones.forEach((subOpc: any) => {
+            if (subOpcion.id == subOpc.id) {
+              opc.push(subOpcion);
             }
-          })
-        })
-      }
-    });
+          });
+        });
+        this.selected[opcion.id] = opc;
+      });
+    }
+    );
   }
 
   // INIT -> FECHA CON RELOJ
@@ -206,6 +249,11 @@ export class DialogRolComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

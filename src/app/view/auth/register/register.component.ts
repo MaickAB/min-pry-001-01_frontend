@@ -32,18 +32,14 @@ export class RegisterComponent {
     this.usuario = { login: '', email: '', password: '', password_confirmation: '', fechaInicio: '', fechaFin: '', descripcion: '' };
   }
 
-  // NAVEGA -> HOME
-  navHome() {
-    this.route.navigateByUrl('', { skipLocationChange: false });
-  }
-
   // GUARDA -> DATOS USUARIO
-  saveUsuario() {
-    if (this.validarDatos(this.usuario)) {
+  save() {
+    if (this.validate(this.usuario)) {
       this.authService.register(this.usuario).subscribe({
         next: () => {
-          this.showMessage(), setTimeout(async () => {
-            await this.navLogin(); // Redireccionar después de 3 segundos
+          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
+          setTimeout(async () => {
+            await this.route.navigateByUrl('auth/login', { skipLocationChange: false }); // Redireccionar después de 3 segundos
           }, 2000);
         },
         error: (error) => this.error = error
@@ -54,7 +50,7 @@ export class RegisterComponent {
   }
 
   // VALIDA -> DATOS
-  validarDatos(usuario: Usuario) {
+  validate(usuario: Usuario) {
     if (!usuario) {
       return false;
     }
@@ -69,15 +65,4 @@ export class RegisterComponent {
       confirmPassword.test(usuario.password_confirmation)
     ) ? true : false;
   }
-
-  // NAVEGA -> LOGIN-USER
-  navLogin() {
-    this.route.navigateByUrl('auth/login', { skipLocationChange: false });
-  }
-
-  // MUESTRA -> MENSAJE
-  showMessage() {
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Message Content' });
-  }
-
 }

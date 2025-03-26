@@ -13,8 +13,9 @@ import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Socio } from '../../../../../../utility/models/gestion/codificador/entorno/Socio';
 import { DialogSocioComponent } from '../dialog-socio/dialog-socio.component';
-import { SocioService } from '../../../../../../../service/gestion/codificador/entorno/Socio.service';
-import { ActivatedRoute } from '@angular/router';
+import { SocioService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/Socio.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
 
 @Component({
   selector: 'app-index-socio',
@@ -29,6 +30,7 @@ export class IndexSocioComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
 
   // BODY
   @Input() idCooperativa!: any;
@@ -43,10 +45,15 @@ export class IndexSocioComponent {
   /* METHODS
   -------------------------*/
   constructor(
-    private route: ActivatedRoute,
+    private route: Router,
+    private principalService: PrincipalService,
     private socioService: SocioService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
+  }
+
+  ngOnInit() {
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
   }
 
   // SHOW -> VIEW INDEX
@@ -56,12 +63,16 @@ export class IndexSocioComponent {
     console.log('REQUEST->index');
     this.socioService.index(this.idCooperativa).subscribe({
       next: (response) => {
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.04');
+        // BODY
         this.socios = response.socios;
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -72,6 +83,11 @@ export class IndexSocioComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate(this.idCooperativa);
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(socio: Socio) {
+    this.dialog.showShow(socio);
   }
 
   // SHOW -> VIEW EDIT
@@ -100,20 +116,21 @@ export class IndexSocioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
-  }
-
   // EXPORT -> DATA A XLS
   exportXLS() {
     alert('exportXLS');
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }
 

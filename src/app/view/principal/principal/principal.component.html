@@ -4,7 +4,11 @@
 <div class="layout-wrapper" [ngClass]="containerClass">
 
   <!-- TOP-BAR -->
-  <app-topbar [roles]="roles" (changeRol)="showPermisos($event)" (changeRoles)="reload($event)"></app-topbar>
+  <app-topbar [roles]="roles" [rol]="rol" [load]="load" (changeRol)="updateRol($event)" (changeRoles)="reload()"
+    (eventOption)="showTopOption($event)"></app-topbar>
+  <app-config></app-config>
+  <app-help></app-help>
+  <app-user [usuario]="usuario"></app-user>
 
   <!-- SIDE-BAR -->
   <div class="layout-sidebar shadow-5">

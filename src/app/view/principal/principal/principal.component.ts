@@ -11,22 +11,36 @@ import { AppSidebarComponent } from './components/sidebar/app.sidebar.component'
 import { AppFooterComponent } from './components/footer/app.footer.component'
 import { LayoutService } from '../../../service/principal/app.layout.service'
 import { PrincipalService } from '../../../service/principal/Principal.service'
+import { HelpComponent } from './components/topOptions/help/help.component'
+import { UserComponent } from './components/topOptions/user/user.component'
+import { ConfigComponent } from './components/topOptions/config/config.component'
 
 @Component({
   selector: 'app-principal',
   standalone: true,
-  imports: [CommonModule, NgClass, AppTopBarComponent, AppSidebarComponent, RouterOutlet, AppFooterComponent],
+  imports: [CommonModule, NgClass, AppTopBarComponent, AppSidebarComponent, RouterOutlet, AppFooterComponent, UserComponent, HelpComponent, ConfigComponent],
   templateUrl: './principal.component.html',
   styleUrl: './principal.component.css'
 })
-export class PrincipalComponent implements OnInit {
+export class PrincipalComponent {
   @ViewChild(AppSidebarComponent) appSidebar!: AppSidebarComponent
   @ViewChild(AppTopBarComponent) appTopbar!: AppTopBarComponent
-  roles!: any[];
-
+  @ViewChild(HelpComponent) helpSider!: HelpComponent;
+  @ViewChild(UserComponent) userSider!: UserComponent;
+  @ViewChild(ConfigComponent) configSider!: ConfigComponent;
   overlayMenuOpenSubscription: Subscription
   menuOutsideClickListener: (() => void) | null = null
   profileMenuOutsideClickListener: (() => void) | null = null
+
+  /* ATTRIBUTES
+   -------------------------*/
+  usuario!: any;
+  roles!: any[];
+  rol!: any;
+
+  // STATE
+  load: boolean = false;
+  evento!: Subscription; // OYE CAMBIOS DEL MOD_RUCUROS-HUMANOS, 
 
   constructor(
     public layoutService: LayoutService,
@@ -74,42 +88,6 @@ export class PrincipalComponent implements OnInit {
       this.hideMenu()
       this.hideProfileMenu()
     })
-  }
-
-  ngOnInit() {
-    this.getRoles();
-  }
-
-  // OBTIENE -> ROLES
-  getRoles() {
-    if (this.principalService.getRolesStorage())
-      this.roles = this.principalService.getRolesStorage();
-    else {
-      console.log('REQUEST->getRoles');
-      this.principalService.getRoles().subscribe({
-        next: (response) => {
-          this.roles = response.roles;
-          this.principalService.setRolesStorage(this.roles);
-          this.principalService.setUsuarioStorage(response.usuario);
-          console.log('RESPONSE->getRoles', response);
-        },
-        error: (error) => {
-          console.log('RESPONSE->getRoles Error en:', error.error);
-        }
-      });
-    }
-  }
-
-  // ENVIA -> ROL
-  showPermisos(permisos: any) {
-    this.router.navigateByUrl('principal', { skipLocationChange: false });
-    this.appSidebar.showPermisos(permisos);
-  }
-
-  // ENVIA -> ROL
-  reload(permisos: any) {
-    this.getRoles();
-    this.appSidebar.showPermisos(permisos);
   }
 
   get containerClass() {
@@ -174,7 +152,71 @@ export class PrincipalComponent implements OnInit {
     if (this.menuOutsideClickListener) {
       this.menuOutsideClickListener()
     }
+    this.evento.unsubscribe();
   }
 
+  /* METHODS
+  -------------------------*/
+  // LOAD -> DATA INICIAL
+  ngOnInit() {
+    this.show();
+    // ESCUCHA CAMBIOS DE MOD_RRHH Y RELOAD AUTOMATICAMENTE
+    this.evento = this.principalService.evento.subscribe(() => {
+      this.reload();
+    });
+  }
+
+  // SHOW -> VIEW PRINCIPAL
+  show() {
+    if (this.principalService.getUsuarioStorage()) {
+      this.usuario = this.principalService.getUsuarioStorage();
+      this.roles = this.principalService.getRolesStorage();
+      this.rol = this.principalService.getRolSelectedStorage();
+    }
+    else {
+      this.load = true;
+      console.log('REQUEST->getDataUser');
+      this.principalService.getDataUser().subscribe({
+        next: (response) => {
+          this.usuario = response.usuario;
+          this.roles = response.roles;
+          this.rol = this.roles[0];
+          this.principalService.setUsuarioStorage(this.usuario);
+          this.principalService.setRolesStorage(this.roles);
+          this.principalService.setRolSelectedStorage(this.rol);
+          this.appSidebar.show(this.rol.permisos);
+          window.location.reload();
+          this.load = false;
+          console.log('RESPONSE->getDataUser', response);
+        },
+        error: (error) => {
+          console.log('RESPONSE->getDataUser Error en:', error.error);
+        }
+      });
+    }
+  }
+
+  // UPDATE -> ROL SELECTED
+  updateRol(rol: any) {
+    this.rol = rol;
+    this.principalService.setRolSelectedStorage(this.rol);
+    this.router.navigateByUrl('principal', { skipLocationChange: false });
+    this.appSidebar.show(rol.permisos); // Se notifica al sidBar del cambio
+  }
+
+  // RELOAD -> VIEW PRINCIPAL
+  reload() {
+    this.principalService.deleteRolesStorage();
+    this.show();
+  }
+
+  // SHOW -> VIEW TOP-OPTION
+  showTopOption(option: string) {
+    switch (option) {
+      case 'config': this.configSider.show(); break;
+      case 'help': this.helpSider.show(); break;
+      case 'user': this.userSider.show(); break;
+    }
+  }
 
 }

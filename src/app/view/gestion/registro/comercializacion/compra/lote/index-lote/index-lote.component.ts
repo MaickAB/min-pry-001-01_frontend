@@ -20,6 +20,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
 import { Sucursal } from '../../../../../../utility/models/gestion/codificador/recursoMaterial/Sucursal';
 import { ShowLoteComponent } from '../show-lote/show-lote.component';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
 
 @Component({
   selector: 'app-index-lote',
@@ -34,6 +35,7 @@ export class IndexLoteComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
   sucursales!: Sucursal[];
 
@@ -51,6 +53,7 @@ export class IndexLoteComponent {
   -------------------------*/
   constructor(
     private route: Router,
+    private principalService: PrincipalService,
     private loteService: LoteService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -68,6 +71,7 @@ export class IndexLoteComponent {
     this.loteService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
         this.regionales = response.regionales;
         this.sucursales = []
 
@@ -79,6 +83,7 @@ export class IndexLoteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -89,6 +94,11 @@ export class IndexLoteComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: any) {
+    this.detail.show(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -117,35 +127,11 @@ export class IndexLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW DETAIL
-  showDetail(id: any) {
-    this.detail.show(id);
-  }
-
-  // SHOW -> VIEW INDEX DESCUENTOS
-  showDescuentos(id: any) {
-    // this.descuento.index(id);
-  }
-
-  // SHOW -> VIEW INDEX LEYES
-  showLeyes(id: any) {
-    this.route.navigateByUrl('registro/comercializacion/ingreso/sublote/index/' + id, { skipLocationChange: true });
-  }
-
-  // SHOW -> VIEW INDEX SUBLOTES
-  showSublotes(id: any) {
-    this.route.navigateByUrl('registro/comercializacion/ingreso/sublote/index/' + id, { skipLocationChange: true });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORT -> DATA A XLS
@@ -181,5 +167,10 @@ export class IndexLoteComponent {
   // CLEAR -> FILTRO SUCURSAL
   clearFilterSucursal() {
     this.lotes = this.dataFiltrado;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

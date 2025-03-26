@@ -2,7 +2,7 @@
 
   <!-- LOGO -->
   <a class="layout-topbar-logo" routerLink="">
-    <h3 class="text-blue-600 pt-3">MINEXA S.A.</h3>
+    <h3 class="text-blue-600 pt-3">MINEXA S.R.L.</h3>
   </a>
 
   <!-- MOSTRAR/OCULATAR SIDERBAR -->
@@ -20,35 +20,32 @@
     [ngClass]="{ 'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible }">
 
     <!-- RECARGAR ROLES -->
-    <button class="p-link layout-topbar-button" style="border: 1px solid #888;" (click)="recargarRoles()">
-      <i class="pi pi-refresh textColor"></i>
+    <button class="p-link layout-topbar-button" style="border: 1px solid #888;" (click)="updateRoles()">
+      <i *ngIf="!load" class="pi pi-refresh textColor"></i>
+      <i *ngIf="load" class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       <span>Recargar Roles</span>
     </button>
 
     <!-- ROLES-USUARIO -->
-    <p-dropdown [options]="roles" [(ngModel)]="rolSelected" optionLabel="rol" placeholder="Elija un rol..."
-      [style]="{'min-width':'200px','margin-left':'10px'}" (onChange)="showPermisos()" />
+    <p-dropdown [options]="roles" [(ngModel)]="rol" optionLabel="rol" placeholder="Elija un rol..."
+      [style]="{'min-width':'200px','margin-left':'10px'}" (onChange)="updateRol()" />
 
     <!-- AYUDA -->
-    <button class="p-link layout-topbar-button" (click)="showHelp()">
+    <button class="p-link layout-topbar-button" (click)="showOption('help')">
       <i class="pi pi-calendar textColor"></i>
       <span>Ayuda</span>
     </button>
 
     <!-- CONFIGURACIÓN -->
-    <button class="p-link layout-topbar-button" (click)="showConfig()">
+    <button class="p-link layout-topbar-button" (click)="showOption('config')">
       <i class="pi pi-cog textColor"></i>
       <span>Configuración</span>
     </button>
 
     <!-- USUARIO -->
-    <button class="p-link layout-topbar-button" (click)="showUser()">
+    <button class="p-link layout-topbar-button" (click)="showOption('user')">
       <i class=" pi pi-user textColor"></i>
       <span>Usuario</span>
     </button>
   </div>
 </div>
-
-<app-help></app-help>
-<app-user></app-user>
-<app-config></app-config>

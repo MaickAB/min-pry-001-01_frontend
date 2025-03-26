@@ -2,8 +2,8 @@ export interface Cotizacion {
     id?: number,
     fecha: string,
     observacion: string,
-    cotizacionmineral: CotMineral[],
-    cotizaciondivisa: CotDivisa[],
+    cotizacion_mineral: CotMineral[],
+    cotizacion_divisa: CotDivisa[],
     estado?: boolean
 }
 

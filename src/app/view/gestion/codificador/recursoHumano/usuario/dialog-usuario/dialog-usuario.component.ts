@@ -22,6 +22,7 @@ import { Usuario } from '../../../../../utility/models/gestion/codificador/recur
 import { UsuarioService } from '../../../../../../service/gestion/codificador/recursoHumano/Usuario.service';
 import { Persona } from '../../../../../utility/models/gestion/codificador/recursoHumano/Persona';
 import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-usuario',
@@ -35,6 +36,7 @@ export class DialogUsuarioComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   personas!: Persona[];
 
   // BODY
@@ -55,12 +57,14 @@ export class DialogUsuarioComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   activeIndex!: number;
   @Output() changeUsuario = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private usuarioService: UsuarioService) {
@@ -71,11 +75,13 @@ export class DialogUsuarioComponent {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     this.activeIndex = 0;
     console.log('REQUEST->create');
     this.usuarioService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.03');
         this.personas = response.personas;
         // BODY
         this.personaSelected = { documento: '', nombre: '', apePaterno: '', apeMaterno: '', direccion: '', fono: '', foto: '', descripcion: '' };
@@ -94,6 +100,7 @@ export class DialogUsuarioComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -101,16 +108,24 @@ export class DialogUsuarioComponent {
     });
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.showEdit(id);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(id: number) {
     this.estado = true;
     this.loading = true;
     this.saving = false;
+    this.disabled = false;
     this.activeIndex = 0;
     console.log('REQUEST->edit', id);
     this.usuarioService.edit(id).subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('04.03');
         this.personas = response.personas;
         // BODY
         this.roles = response.roles;
@@ -118,7 +133,7 @@ export class DialogUsuarioComponent {
         this.imgUrl = response.usuario.persona.foto;
         this.imgValida = true;
         this.usuario = response.usuario;
-        this.updateSelecteds();
+        this.updateData();
         // FOOTER
         this.user = this.principalService.getUsuarioStorage();
         this.fechaHora = this.initReloj();
@@ -127,6 +142,7 @@ export class DialogUsuarioComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -153,6 +169,7 @@ export class DialogUsuarioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -169,13 +186,21 @@ export class DialogUsuarioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
+      // SE NOTIFICA A VIEW-PRINCIPAL PARA QUE RECARGE EL STORAGE
+      this.principalService.reload();
     } else {
       this.messageService.add({ severity: 'error', summary: 'ERROR', detail: 'Datos incorrectos...!!' });
       console.log('Datos Incorrectos...!!');
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CIERRA -> MODAL
@@ -193,7 +218,7 @@ export class DialogUsuarioComponent {
   }
 
   // UPDATE -> COMBOS SELECCIONADOS
-  private updateSelecteds() {
+  private updateData() {
 
     // SE ACTUALIZA LA PERSONA SELECCIONADA
     this.personas.forEach(p => {
@@ -242,6 +267,11 @@ export class DialogUsuarioComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
 

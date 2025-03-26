@@ -11,7 +11,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Router } from '@angular/router';
 import { TooltipModule } from 'primeng/tooltip';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
@@ -19,6 +18,7 @@ import { Sucursal } from '../../../../../utility/models/gestion/codificador/recu
 import { DialogTransferenciaComponent } from '../dialog-transferencia/dialog-transferencia.component';
 import { TransferenciaService } from '../../../../../../service/gestion/registro/transito/Transferencia.service';
 import { Transferencia } from '../../../../../utility/models/gestion/registro/transito/transferencia';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
 
 @Component({
   selector: 'app-index-transferencia',
@@ -32,19 +32,24 @@ export class IndexTransferenciaComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  // HEADER
+  permissions!: any[];
   regionales!: Regional[];
   sucursales!: Sucursal[];
 
+  // BODY
   transferencias!: Transferencia[];
   dataCompleto!: Transferencia[];
   dataFiltrado!: Transferencia[];
 
+  // STATE
   loading: boolean = false;
   @ViewChild(DialogTransferenciaComponent) dialog!: DialogTransferenciaComponent;
 
   /* METHODS
   -------------------------*/
   constructor(
+    private principalService: PrincipalService,
     private transferenciaService: TransferenciaService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -55,17 +60,18 @@ export class IndexTransferenciaComponent {
     this.show();
   }
 
-  // OBTIENE -> DATA INICIAL
+  // SHOW -> VIEW INDEX
   show() {
     this.loading = true;
     console.log('REQUEST->index');
     this.transferenciaService.index().subscribe({
       next: (response) => {
-        // DATA HEADER
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('07.01');
         this.regionales = response.regionales;
         this.sucursales = []
 
-        // DATA BODY        
+        // BODY        
         this.transferencias = response.transferencias;
         this.dataCompleto = response.transferencias;
         console.log('RESPONSE->index', response);
@@ -80,17 +86,22 @@ export class IndexTransferenciaComponent {
     });
   }
 
-  // MUESTRA -> VIEW CREATE
+  // SHOW -> VIEW CREATE
   showCreate() {
-    this.dialog.create();
+    this.dialog.showCreate();
   }
 
-  // MUESTRA -> VIEW EDIT
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
+  }
+
+  // SHOW -> VIEW EDIT
   showEdit(id: number) {
-    this.dialog.edit(id);
+    this.dialog.showEdit(id);
   }
 
-  // MUESTRA -> VIEW DELETE
+  // SHOW -> VIEW DELETE
   showDelete(id: any) {
 
     // MODAL CONFIRMACIÓN
@@ -117,41 +128,43 @@ export class IndexTransferenciaComponent {
     });
   }
 
-  // MUESTRA -> REPORT GENERAL
-  showReportGral() {
-    alert('REPORTE COMPLETO');
+  // EXPORT -> DATA A XLS
+  exportXLS() {
+    alert('exportXLS');
   }
 
-  // MUESTRA -> REPORT INDIVIDUAL
-  showReport(id: any) {
-    alert('REPORTE INDIVIDUAL');
-  }
+  // ---------------------------------------------
 
-  // CARGA -> SUCURSALES EN EL COMBO
+  // LOAD -> SUCURSALES
   loadSucursales(idRegional: any) {
     const regionalSelected = this.regionales.find(r => r.id === idRegional);
     this.sucursales = regionalSelected ? regionalSelected.sucursales : [];
   }
 
-  // FILTRA -> LOTES POR REGIONAL
+  // FILTER -> LOTES POR REGIONAL
   filterByRegional(idRegional: number) {
     this.transferencias = this.dataCompleto.filter((val) => val.idRegionalOrigen == idRegional);
     this.dataFiltrado = this.transferencias;
     this.loadSucursales(idRegional);
   }
 
-  // FILTRA -> LOTES POR SUCURSAL
+  // FILTER -> LOTES POR SUCURSAL
   filterBySucursal(idSucursal: number) {
     this.transferencias = this.dataCompleto.filter((val) => val.idSucursalOrigen == idSucursal);
   }
 
-  // ELIMINA -> FILTRO REGIONAL
+  // CLEAR -> FILTRO REGIONAL
   clearFilterRegional() {
     this.transferencias = this.dataCompleto;
   }
 
-  // ELIMINA -> FILTRO SUCURSAL
+  // CLEAR -> FILTRO SUCURSAL
   clearFilterSucursal() {
     this.transferencias = this.dataFiltrado;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

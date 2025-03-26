@@ -19,6 +19,7 @@ import { Lote } from '../../../../../../utility/models/gestion/registro/comercia
 import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
 import { LoteService } from '../../../../../../../service/gestion/registro/comercializacion/compra/Lote.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-lote',
@@ -32,6 +33,7 @@ export class DialogLoteComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   regionales!: Regional[];
   sucursales!: Sucursal[];
 
@@ -60,6 +62,7 @@ export class DialogLoteComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private loteService: LoteService) {
@@ -74,6 +77,7 @@ export class DialogLoteComponent {
     this.loteService.create().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
         this.regionales = response.regionales;
         this.sucursales = []
         // BODY        
@@ -94,6 +98,7 @@ export class DialogLoteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->create Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -111,6 +116,7 @@ export class DialogLoteComponent {
       next: (response) => {
 
         // DATA HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
         this.regionales = response.regionales;
         this.loadSucursales(response.lote.idRegional);
 
@@ -132,6 +138,7 @@ export class DialogLoteComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->edit Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -157,6 +164,7 @@ export class DialogLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       } else {
@@ -173,6 +181,7 @@ export class DialogLoteComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -250,6 +259,11 @@ export class DialogLoteComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

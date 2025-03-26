@@ -20,19 +20,9 @@ export class SubLoteService {
     return this.httpClient.get<any>(this.url + 'index/' + id);
   }
 
-  // OBTIENE -> DATA PARA EL CREATE
-  public create(): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'create');
-  }
-
   // GUARDA -> LOTE
   public store(data: any): Observable<any> {
     return this.httpClient.post<any>(this.url + 'store', data);
-  }
-
-  // OBTIENE -> DATA PARA EL EDIT
-  public edit(id: number): Observable<any> {
-    return this.httpClient.get<any>(this.url + 'edit/' + id);
   }
 
   // ACTUALIZA -> SUBLOTE
@@ -43,5 +33,10 @@ export class SubLoteService {
   // ELIMINA -> SUBLOTE
   public destroy(id: number): Observable<any> {
     return this.httpClient.delete<any>(this.url + 'destroy/' + id);
+  }
+
+  // REPORT
+  public report(id: number): Observable<any> {
+    return this.httpClient.get<any>(this.url + 'report/' + id);
   }
 }

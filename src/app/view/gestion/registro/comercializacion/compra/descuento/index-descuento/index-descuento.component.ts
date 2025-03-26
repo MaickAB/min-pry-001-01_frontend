@@ -1,7 +1,6 @@
 /* =============================================
     CONTROLLER INDEX DESCUENTOS
 ============================================= */
-
 import { Component, ViewChild, Output, EventEmitter, Input } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
@@ -19,7 +18,8 @@ import { DialogDescuentoComponent } from '../dialog-descuento/dialog-descuento.c
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { Lote } from '../../../../../../utility/models/gestion/registro/comercializacion/compra/Lote';
 import { DescuentoService } from '../../../../../../../service/gestion/registro/comercializacion/compra/Descuento.service';
-
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-descuento',
@@ -33,40 +33,54 @@ export class IndexDescuentoComponent {
 
   /* ATTRIBUTES
  -------------------------*/
-  @Input() lote!: Lote;
-  @Input() descuentos!: any[];
-  @Input() deducciones!: any[];
+  // HEADER
+  permissions!: any[];
 
+  // BODY
+  @Input() lote!: any;
+  @Input() descuentos!: any[];
   descuento!: any;
+
+  // STATE
   estado!: boolean;
   loading!: boolean;
 
   @ViewChild(DialogDescuentoComponent) dialog!: DialogDescuentoComponent;
-  @Output() changeDescuento = new EventEmitter();
+  @Output() changeDescuentos = new EventEmitter<any>();
 
   /* METHODS
   -------------------------*/
-  // INYECCTIÓN -> DEPENDENCIAS
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private messageService: MessageService,
     private descuentoService: DescuentoService,
     private confirmationService: ConfirmationService) {
   }
 
-  // MUESTRA -> VIEW INDEX
+  // LOAD -> DATA INICIAL
+  ngOnInit() {
+    this.permissions = this.principalService.getPermissionsStorage('06.01');
+  }
+
+  // SHOW -> VIEW INDEX
   show() {
     this.estado = true;
     this.loading = true;
     console.log('REQUEST->index');
     this.descuentoService.index(this.lote.id).subscribe({
       next: (response) => {
-        this.deducciones = response.deducciones;
+        // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('06.01');
+        // BODY        
         this.descuentos = response.descuentos;
+        this.changeDescuentos.emit(this.descuentos);
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -74,23 +88,23 @@ export class IndexDescuentoComponent {
     });
   }
 
-  // MUESTRA -> VIEW CREATE
+  // SHOW -> VIEW CREATE
   showCreate() {
-    this.dialog.create(this.lote.id);
+    this.dialog.showCreate(this.lote.id);
   }
 
-  // MUESTRA -> VIEW DETAIL
-  showDetail(id: any) {
-    alert('DETALLE DESCUENTO ' + id);
+  // SHOW -> VIEW SHOW
+  showShow(descuento: any) {
+    this.dialog.showShow(descuento);
   }
 
-  // MUESTRA -> VIEW EDIT
+  // SHOW -> VIEW EDIT
   showEdit(descuento: any) {
-    this.dialog.edit(descuento);
+    this.dialog.showEdit(descuento);
   }
 
-  // MUESTRA -> VIEW DELETE
-  showDelete(id: any) {
+  // SHOW -> VIEW DELETE
+  showDelete(id: number) {
 
     // MODAL CONFIRMACIÓN
     this.confirmationService.confirm({
@@ -110,24 +124,24 @@ export class IndexDescuentoComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // getTotalDeduccionGral(field: string): number {
-  //   return this.deducciones.reduce((total, item) => total + (item[field] || 0), 0).toFixed(2);
-  // }
-  // getTotalDeduccion(field: string): number {
-  //   return this.deducciones.reduce((total, item) => total + (item[field] || 0), 0).toFixed(2);
-  // }
-
-  // MUESTRA -> REPORT GENERAL
-  report() {
-    alert('REPORTE COMPLETO');
+  // EXPORT -> DATA A XLS
+  exportXLS() {
+    alert('exportXLS');
   }
 
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
+  }
+
+  // CALCULATE -> TOTALES
   total(col: string): number {
     return this.descuentos.reduce((total, item) => total + (item[col] || 0), 0).toFixed(2);
   }

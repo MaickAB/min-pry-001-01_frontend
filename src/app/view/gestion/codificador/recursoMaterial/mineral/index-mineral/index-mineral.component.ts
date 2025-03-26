@@ -16,6 +16,8 @@ import { DialogMineralComponent } from '../dialog-mineral/dialog-mineral.compone
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TipoMineral } from '../../../../../utility/models/utility/TipoMineral';
 import { DropdownModule } from 'primeng/dropdown';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-mineral',
@@ -30,6 +32,7 @@ export class IndexMineralComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
   tipoMinerales!: TipoMineral[];
 
   // BODY
@@ -43,6 +46,8 @@ export class IndexMineralComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private mineralService: MineralService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -60,6 +65,7 @@ export class IndexMineralComponent {
     this.mineralService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('02.03');
         this.tipoMinerales = response.tipoMinerales;
         // BODY
         this.minerales = response.minerales;
@@ -69,6 +75,7 @@ export class IndexMineralComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -79,6 +86,11 @@ export class IndexMineralComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -107,15 +119,11 @@ export class IndexMineralComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -126,12 +134,17 @@ export class IndexMineralComponent {
   // ---------------------------------------------
 
   // FILTER -> MINERALES POR TIPO
-  filter(idTipoMineral: number) {
-    this.minerales = this.data.filter((val) => val.idTipoMineral == idTipoMineral);
+  filter(idParent: number) {
+    this.minerales = this.data.filter((val) => val.idTipoMineral == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.minerales = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

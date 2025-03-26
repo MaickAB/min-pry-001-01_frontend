@@ -9,8 +9,9 @@
         </div>
         <div class="col-6 text-right">
             <!-- NUEVO -->
-            <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="primary"
-                label="Agregar Descuento" icon="pi pi-plus" (click)="showCreate()" [style]="{'width':'200px'}" />
+            <p-button *ngIf="hasPermission('06.01.12.01') && lote.estado_lote.codigo == 1" pRipple [outlined]="true"
+                [raised]="true" [text]="true" severity="primary" label="Agregar SubLote" icon="pi pi-plus"
+                (click)="showCreate()" [style]="{'width':'200px'}" />
         </div>
     </div>
     <hr>
@@ -21,10 +22,10 @@
         <!-- TABLE HEADER -->
         <ng-template pTemplate="header">
             <tr>
-                <th pSortableColumn="fechaHora" style="width:20%">
+                <th pSortableColumn="fechaHora" style="width:30%">
                     SOCIO <p-sortIcon field="fechaHora" />
                 </th>
-                <th pSortableColumn="monto" style="width:55%">
+                <th pSortableColumn="monto" style="width:45%">
                     DETALLE <p-sortIcon field="monto" />
                 </th>
                 <th pSortableColumn="monto" style="width:25%">
@@ -37,65 +38,33 @@
         <ng-template pTemplate="body" let-subLote>
             <tr>
                 <td>
+                    <h2><span class="prefijoRow">{{ subLote.porcentaje }}&nbsp;%</span></h2>
                     {{ subLote.socio }}
-                    <h3>{{ subLote.porcentaje }}&nbsp;%</h3>
                 </td>
                 <td>
                     <div class="grid">
                         <div class="col-4">
                             <span class="prefijoRow">Peso Bruto: </span> <br>
-                            <span class="prefijoRow">Peso Neto: </span> <br>
                             <span class="prefijoRow">Tara: </span> <br>
-                            <span class="prefijoRow">Humedad: </span>
+                            <span class="prefijoRow">Humedad: </span> <br>
+                            <span class="prefijoRow">Peso Neto: </span>
                         </div>
                         <div class="col-4 text-right">
                             {{ subLote.pesoBruto }} Kg.<br>
-                            {{subLote.pesoNeto}} kg. <br>
                             {{subLote.tara}} Kg.<br>
-                            {{subLote.humedad}} Kg.
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="grid">
-                        <div class="col-4">
-                            <span class="prefijoRow">Bruto: </span>
-                        </div>
-                        <div class="col-4 text-right">
-                            {{ subLote.mineralSus }} $us
-                        </div>
-                        <div class="col-4 text-right">
-                            {{subLote.mineralBs}} Bs.
-                        </div>
-                    </div>
-                    <div class="grid">
-                        <div class="col-4">
-                            <span class="prefijoRow">Regalia: </span>
-                        </div>
-                        <div class="col-4 text-right">
-                            {{ subLote.regaliaSus }} $us
-                        </div>
-                        <div class="col-4 text-right">
-                            {{subLote.regaliaBs}} Bs.
-                        </div>
-                    </div>
-                    <div class="grid">
-                        <div class="col-4">
-                            <span class="prefijoRow">Neto: </span>
-                        </div>
-                        <div class="col-4 text-right">
-                            {{ subLote.netoSus }} $us
-                        </div>
-                        <div class="col-4 text-right">
-                            {{subLote.netoBs}} Bs.
+                            {{subLote.humedad}} Kg.<br>
+                            {{subLote.pesoNeto}} kg.
                         </div>
                     </div>
                 </td>
                 <td>
-                    <p-button pRipple icon="pi pi-print" class="mr-2" [rounded]="true" [outlined]="true" severity="info"
-                        (click)="showDetail(subLote.id)" />
-                    <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                        severity="success" (click)="showEdit(subLote)" />
-                    <p-button pRipple icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
+                    <p-button *ngIf="hasPermission('06.01.12.02')" pRipple icon="pi pi-eye" class="mr-2"
+                        [rounded]="true" [outlined]="true" severity="primary" (click)="showShow(subLote)" />
+                    <p-button *ngIf="hasPermission('06.01.12.03') && lote.estado_lote.codigo == 1" pRipple
+                        icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" severity="success"
+                        (click)="showEdit(subLote)" />
+                    <p-button *ngIf="hasPermission('06.01.12.04') && lote.estado_lote.codigo == 1" pRipple
+                        icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true"
                         (click)="showDelete(subLote.id)" />
                 </td>
             </tr>

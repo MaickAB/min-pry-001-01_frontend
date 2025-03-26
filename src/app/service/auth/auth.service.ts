@@ -2,7 +2,7 @@
         SERVICE AUTH
 ================================== */
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -14,7 +14,7 @@ import { Usuario } from '../../view/utility/models/gestion/codificador/recursoHu
   providedIn: 'root'
 })
 export class AuthService {
-  private url = 'https://min-pry-001-01backend-production.up.railway.app/api/auth/';
+  private url = 'http://127.0.0.1:8000/api/auth/';
 
   constructor(
     private httpClient: HttpClient,
@@ -38,6 +38,8 @@ export class AuthService {
         if (response.access_token) {
           this.setToken(response.access_token);
           this.setUsuario(response.usuario);
+          this.setRoles(response.roles);
+          this.setRolSelected(response.roles[0]);
         };
         return response;
       }),
@@ -47,13 +49,25 @@ export class AuthService {
   }
 
   // CIERRA SESIÓN
-  public logout(): void {
+  public logout(): Observable<any> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     localStorage.removeItem('token');
+    localStorage.removeItem('usuario');
     localStorage.removeItem('roles');
     localStorage.removeItem('rol');
-    localStorage.removeItem('usuario');
+    return this.httpClient.post<any>(this.url + 'logout', {}, { headers }).pipe(
+      map(response => {
+        return response;
+      }),
+      catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
+    );
   }
 
+
+  // VERIFY -> USER AUTENTICADO
   public isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token)
@@ -63,24 +77,37 @@ export class AuthService {
     return Date.now() < exp;
   }
 
+  // SAVE -> TOKEN
   private setToken(token: string): void {
     localStorage.setItem('token', token);
   }
 
-  // GUARDA -> USUARIO EN STORAGE
+  // GET -> TOKEN
+  private getToken(): string | null {
+    return localStorage.getItem('token')
+  }
+
+  // SAVE -> USUARIO EN STORAGE
   public setUsuario(usuario: any): void {
     const usuarioString = JSON.stringify(usuario);
     localStorage.setItem('usuario', btoa(usuarioString));
   }
 
-  // OBTIENE -> USUARIO DEL STORAGE
-  public getUsuario(): any | null {
-    const usuarioString = localStorage.getItem('usuario');
-    return usuarioString ? JSON.parse(atob(usuarioString)) : null;
+  // SAVE -> ROLES EN STORAGE
+  public setRoles(roles: any): void {
+    const rolesString = JSON.stringify(roles);
+    localStorage.setItem('roles', btoa(rolesString));
   }
 
-  private getToken(): string | null {
-    return localStorage.getItem('token')
+  // SAVE -> ROL SELECCIONADO EN EL STORAGE
+  public setRolSelected(rol: any): void {
+    const rolString = JSON.stringify(rol);
+    localStorage.setItem('rol', btoa(rolString));
   }
 
+  // GET -> USUARIO DEL STORAGE
+  // public getUsuario(): any | null {
+  //   const usuarioString = localStorage.getItem('usuario');
+  //   return usuarioString ? JSON.parse(atob(usuarioString)) : null;
+  // }
 }

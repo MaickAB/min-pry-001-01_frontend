@@ -16,6 +16,8 @@ import { Usuario } from '../../../../../utility/models/gestion/codificador/recur
 import { UsuarioService } from '../../../../../../service/gestion/codificador/recursoHumano/Usuario.service';
 import { DropdownModule } from 'primeng/dropdown';
 import { Regional } from '../../../../../utility/models/gestion/codificador/recursoMaterial/Regional';
+import { PrincipalService } from '../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-index-usuario',
@@ -30,6 +32,7 @@ export class IndexUsuarioComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEAD
+  permissions!: any[];
   regionales!: Regional[];
 
   // BODY
@@ -43,6 +46,8 @@ export class IndexUsuarioComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private usuarioService: UsuarioService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -60,6 +65,7 @@ export class IndexUsuarioComponent {
     this.usuarioService.index().subscribe({
       next: (response) => {
         // HEAD
+        this.permissions = this.principalService.getPermissionsStorage('04.03');
         this.regionales = response.regionales;
         // BODY
         this.usuarios = response.usuarios;
@@ -67,9 +73,9 @@ export class IndexUsuarioComponent {
         console.log('RESPONSE->index', response);
       },
       error: (error) => {
-        this.usuarios = [];
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE -> Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -80,6 +86,11 @@ export class IndexUsuarioComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -108,15 +119,11 @@ export class IndexUsuarioComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
-  }
-
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
   }
 
   // EXPORTA -> DATA A XLS
@@ -127,12 +134,17 @@ export class IndexUsuarioComponent {
   // ---------------------------------------------
 
   // FILTER -> RECORDS BY ID-REGIONAL
-  filter(idRegional: number) {
-    this.usuarios = this.data.filter((val) => val.persona.idRegional == idRegional);
+  filter(idParent: number) {
+    this.usuarios = this.data.filter((val) => val.persona.idRegional == idParent);
   }
 
   // CLEAR -> FILTER
   clearFilter() {
     this.usuarios = this.data;
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 }

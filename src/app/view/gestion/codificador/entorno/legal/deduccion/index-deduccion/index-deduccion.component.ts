@@ -14,6 +14,8 @@ import { DialogDeduccionComponent } from '../dialog-deduccion/dialog-deduccion.c
 import { Deduccion } from '../../../../../../utility/models/gestion/codificador/entorno/Deduccion';
 import { DeduccionService } from '../../../../../../../service/gestion/codificador/entorno/legal/Deduccion.service';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -29,6 +31,7 @@ export class IndexDeduccionComponent {
   /* ATTRIBUTES
   -------------------------*/
   // HEADER
+  permissions!: any[];
 
   // BODY
   deducciones!: Deduccion[];
@@ -41,6 +44,8 @@ export class IndexDeduccionComponent {
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
+    private principalService: PrincipalService,
     private deduccionService: DeduccionService,
     private messageService: MessageService,
     private confirmationService: ConfirmationService) {
@@ -58,6 +63,7 @@ export class IndexDeduccionComponent {
     this.deduccionService.index().subscribe({
       next: (response) => {
         // HEADER
+        this.permissions = this.principalService.getPermissionsStorage('05.03');
         // BODY        
         this.deducciones = response.deducciones;
         console.log('RESPONSE->index', response);
@@ -65,6 +71,7 @@ export class IndexDeduccionComponent {
       error: (error) => {
         this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
         console.log('RESPONSE->index Error en:', error.error);
+        if (error.status === 401) this.route.navigateByUrl('principal');
       },
       complete: () => {
         this.loading = false;
@@ -75,6 +82,11 @@ export class IndexDeduccionComponent {
   // SHOW -> VIEW CREATE
   showCreate() {
     this.dialog.showCreate();
+  }
+
+  // SHOW -> VIEW SHOW
+  showShow(id: number) {
+    this.dialog.showShow(id);
   }
 
   // SHOW -> VIEW EDIT
@@ -103,20 +115,21 @@ export class IndexDeduccionComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->destroy Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
     });
   }
 
-  // SHOW -> VIEW REPORT
-  showReport(id: number) {
-    alert('showReport' + id);
-  }
-
   // EXPORTA -> DATA A XLS
   exportXLS() {
     alert('exportXLS');
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
 }

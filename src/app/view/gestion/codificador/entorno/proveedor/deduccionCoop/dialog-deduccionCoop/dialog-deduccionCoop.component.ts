@@ -1,5 +1,5 @@
 /* ==================================
-      CONTROLLER DIALOG SOCIO
+  CONTROLLER DIALOG DEDUCCIÓN-COOP
 ================================== */
 import { Component, Output, EventEmitter } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
@@ -14,8 +14,9 @@ import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { PrincipalService } from '../../../../../../../service/principal/Principal.service';
-import { DeduccionCoopService } from '../../../../../../../service/gestion/codificador/entorno/legal/DeduccionCoop.service';
+import { DeduccionCoopService } from '../../../../../../../service/gestion/codificador/entorno/proveedor/DeduccionCoop.service';
 import { CheckboxModule } from 'primeng/checkbox';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dialog-deduccionCoop',
@@ -29,6 +30,10 @@ export class DialogDeduccionCoopComponent {
 
   /* ATTRIBUTES
   -------------------------*/
+  //  HEADER 
+  permissions!: any[];
+
+  // BODY
   deduccionCoop!: any;
 
   // FOOTER
@@ -39,11 +44,13 @@ export class DialogDeduccionCoopComponent {
   estado!: boolean;
   loading!: boolean;
   saving!: boolean;
+  disabled!: boolean;
   @Output() changeDeduccionCoop = new EventEmitter();
 
   /* METHODS
   -------------------------*/
   constructor(
+    private route: Router,
     private principalService: PrincipalService,
     private messageService: MessageService,
     private deduccionCoopService: DeduccionCoopService) {
@@ -53,7 +60,9 @@ export class DialogDeduccionCoopComponent {
   showCreate(idCooperativa: any) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
     // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
     // BODY
     this.deduccionCoop = { idCooperativa: idCooperativa, codigo: '', concepto: '', porcentaje: '', voluntario: false };
     // FOOTER
@@ -61,11 +70,19 @@ export class DialogDeduccionCoopComponent {
     this.fechaHora = this.initReloj();
   }
 
+  // SHOW -> VIEW SHOW
+  showShow(deduccionCoop: any) {
+    this.showEdit(deduccionCoop);
+    this.disabled = true;
+  }
+
   // SHOW -> VIEW EDIT
   showEdit(deduccionCoop: any) {
     this.estado = true;
     this.saving = false;
+    this.disabled = false;
     // HEADER
+    this.permissions = this.principalService.getPermissionsStorage('05.04');
     // BODY
     this.deduccionCoop = deduccionCoop;
     // FOOTER
@@ -92,6 +109,7 @@ export class DialogDeduccionCoopComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->update Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
 
@@ -110,6 +128,7 @@ export class DialogDeduccionCoopComponent {
           error: (error) => {
             this.messageService.add({ severity: 'error', summary: 'ERROR', detail: error.error.message });
             console.log('RESPONSE->store Error en:', error.error);
+            if (error.status === 401) this.route.navigateByUrl('principal');
           }
         });
       }
@@ -117,6 +136,11 @@ export class DialogDeduccionCoopComponent {
       this.messageService.add({ severity: 'error', summary: 'ERROR REQUEST', detail: 'Datos Incorrectos...!!' });
       console.log('Datos Incorrectos...!!')
     }
+  }
+
+  // GENERATE -> REPORT
+  report() {
+    alert('showReport');
   }
 
   // CLOSE -> VIEW
@@ -129,6 +153,11 @@ export class DialogDeduccionCoopComponent {
     setInterval(() => {
       this.fechaHora = new Date(); // Actualiza la fecha y hora cada segundo
     }, 1000);
+  }
+
+  // HAS -> PERMISSION
+  hasPermission(permiso: string) {
+    return this.permissions.some((p: any) => p.id === permiso);
   }
 
   /* VALIDADORES

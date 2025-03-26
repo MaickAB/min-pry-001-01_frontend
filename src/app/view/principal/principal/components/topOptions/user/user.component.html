@@ -1,0 +1,69 @@
+<!-- =================================
+        VIEW USER
+================================== -->
+<p-sidebar [(visible)]="estado" position="right" [style]="{'width':'40%'}">
+
+
+    <!-- SECTOR HEADER -->
+    <div class="grid card-header shadow-5">
+        <div class="col-8">
+            <h3>Usuario</h3>
+        </div>
+        <div class="col-4">
+            <span class="loader"></span>
+        </div>
+    </div>
+    <hr>
+
+    <!-- SECTOR BODY -->
+    <div class="card-body shadow-5">
+
+        <!-- FOTO -->
+        <div class="grid">
+            <div class="col-4">
+                <div class="text-center">
+                    <img [src]="imgUrl" alt="Vista previa de la imagen" style="width: 50%; height: auto;" />
+                </div>
+            </div>
+            <div class="col-8">
+
+                <!-- DATOS USUARIO -->
+                <div class="field">
+                    <label><b>CI:</b> {{usuario.persona.documento}}</label><br>
+                    <label><b>NOMBRE:</b>
+                        {{usuario.persona.nombre}}
+                        {{usuario.persona.apePaterno}}
+                        {{usuario.persona.apeMaterno}}
+                    </label>
+                    <hr>
+                    <label><b>DESCRIPCIÓN:</b>
+                        {{usuario.descripcion}}
+                    </label>
+                    <hr>
+                    <label><b>ROLES:</b></label>
+                    <ul>
+                        <li *ngFor="let rol of usuario.roles">{{ rol.rol.nombre }}</li>
+                    </ul>
+
+                    <label><b>SUCURSALES: </b></label>
+                    <ul>
+                        <li *ngFor="let sucursal of usuario.sucursales">{{ sucursal.regional.nombre }} - {{
+                            sucursal.sucursal.nombre }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="text-right">
+            <p-button pRipple label="Cerrar Sesión" icon="pi pi-sign-out" [text]="true" [raised]="true"
+                severity="primary" (click)="cerrarSesion()" />
+        </div>
+    </div>
+    <hr>
+
+    <!-- SECTOR FOOTER -->
+    <div class=" card-footer">
+
+    </div>
+
+</p-sidebar>

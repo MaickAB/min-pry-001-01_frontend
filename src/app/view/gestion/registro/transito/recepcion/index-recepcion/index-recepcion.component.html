@@ -54,8 +54,9 @@
                     <div class="col-12 md:col-8">
 
                         <!-- REPORTE GENERAL -->
-                        <p-button pRipple [outlined]="true" [raised]="true" [text]="true" severity="info"
-                            label="Reporte" icon="pi pi-print" class="ml-2" (click)="showReportGral()" />
+                        <p-button *ngIf="hasPermission('07.02.07')" pRipple [outlined]="true" [raised]="true"
+                            [text]="true" severity="info" label="Reporte" icon="pi pi-print" class="ml-2"
+                            (click)="exportXLS()" />
                     </div>
                     <div class="col-12 md:col-4 text-right">
                         <!-- BUSCAR -->
@@ -146,10 +147,12 @@
                         }
                     </td>
                     <td>
-                        <p-button pRipple icon="pi pi-eye" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="info" (click)="showReport(transferencia.id)" />
-                        <p-button pRipple icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true"
-                            severity="success" (click)="showEdit(transferencia.id)" />
+                        <p-button *ngIf="hasPermission('07.02.02')" pRipple icon="pi pi-eye" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="primary"
+                            (click)="showShow(transferencia.id)" />
+                        <p-button *ngIf="hasPermission('07.02.03')" pRipple icon="pi pi-pencil" class="mr-2"
+                            [rounded]="true" [outlined]="true" severity="success"
+                            (click)="showEdit(transferencia.id)" />
                     </td>
                 </tr>
             </ng-template>
