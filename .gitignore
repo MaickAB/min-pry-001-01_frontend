@@ -1,0 +1,17 @@
+# Dependencias de Node
+node_modules/
+
+# Archivos de producción (salida del build)
+dist/
+build/
+
+# Archivos de configuraciones locales
+*.log
+*.env
+
+# Archivos de editor (Visual Studio Code, por ejemplo)
+.vscode/
+
+# Archivos de sistema operativo (Mac, Windows, etc)
+.DS_Store
+Thumbs.db
