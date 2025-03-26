@@ -14,7 +14,7 @@ import { Usuario } from '../../view/utility/models/gestion/codificador/recursoHu
   providedIn: 'root'
 })
 export class AuthService {
-  private url = 'http://127.0.0.1:8000/api/auth/';
+  private url = 'https://min-pry-001-01backend-production.up.railway.app/api/auth/';
 
   constructor(
     private httpClient: HttpClient,

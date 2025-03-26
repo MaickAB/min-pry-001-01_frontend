@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PrincipalService {
-  private url = 'http://127.0.0.1:8000/api/principal/';
+  private url = 'https://min-pry-001-01backend-production.up.railway.app/api/principal/';
 
   constructor(
     private httpClient: HttpClient) { }
