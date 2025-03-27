@@ -8,13 +8,14 @@ import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { catchError } from 'rxjs/operators';
 import { Usuario } from '../../view/utility/models/gestion/codificador/recursoHumano/Usuario';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private url = 'http://127.0.0.1:8000/api/auth/';
+  private url = environment.apiURL + 'auth/';
 
   constructor(
     private httpClient: HttpClient,

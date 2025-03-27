@@ -4,6 +4,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,7 @@ import { Observable } from 'rxjs';
 
 export class Cotizacion15Service {
 
-  private url = 'http://127.0.0.1:8000/api/codificador/entorno/legal/cotizacion15/';
+  private url = environment.apiURL + 'codificador/entorno/legal/cotizacion15/';
 
   constructor(
     private httpClient: HttpClient) { }

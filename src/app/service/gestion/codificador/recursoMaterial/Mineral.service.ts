@@ -4,13 +4,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
+import { environment } from '../../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MineralService {
-  private url = 'http://127.0.0.1:8000/api/codificador/recursoMaterial/mineral/';
+  private url = environment.apiURL + 'codificador/recursoMaterial/mineral/';
 
   constructor(
     private httpClient: HttpClient) { }

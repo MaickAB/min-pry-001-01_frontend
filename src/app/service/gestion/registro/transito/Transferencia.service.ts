@@ -4,13 +4,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class TransferenciaService {
-  private url = 'http://127.0.0.1:8000/api/registro/transito/transferencia/';
+  private url = environment.apiURL + 'registro/transito/transferencia/';
 
   constructor(
     private httpClient: HttpClient) { }

@@ -4,12 +4,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeduccionService {
-  private url = 'http://127.0.0.1:8000/api/codificador/entorno/legal/deduccion/';
+  private url = environment.apiURL + 'codificador/entorno/legal/deduccion/';
 
   constructor(
     private httpClient: HttpClient) { }

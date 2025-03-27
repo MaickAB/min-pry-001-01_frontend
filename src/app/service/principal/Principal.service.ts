@@ -5,13 +5,14 @@ import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class PrincipalService {
-  private url = 'http://127.0.0.1:8000/api/principal/';
+  private url = environment.apiURL + 'principal/';
   public evento = new EventEmitter<void>();
 
   constructor(

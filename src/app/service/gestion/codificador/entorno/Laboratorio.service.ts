@@ -4,6 +4,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 
 
 @Injectable({
@@ -11,7 +12,7 @@ import { Observable } from 'rxjs';
 })
 export class LaboratorioService {
 
-  private url = 'http://127.0.0.1:8000/api/codificador/entorno/laboratorio/';
+  private url = environment.apiURL + 'codificador/entorno/laboratorio/';
 
   constructor(
     private httpClient: HttpClient) { }
